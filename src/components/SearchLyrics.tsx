@@ -6,15 +6,13 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
 interface SearchParams {
-  title?: string;
-  artist?: string;
+  title: string;
+  artist: string;
 }
 
 const fetchLyrics = async ({ title, artist }: SearchParams) => {
   const response = await fetch(
-    `https://api.lyrics.ovh/v1/${encodeURIComponent(artist || "")}/${encodeURIComponent(
-      title || ""
-    )}`
+    `https://api.lyrics.ovh/v1/${encodeURIComponent(artist)}/${encodeURIComponent(title)}`
   );
   if (!response.ok) {
     throw new Error("Lyrics not found");
@@ -23,22 +21,22 @@ const fetchLyrics = async ({ title, artist }: SearchParams) => {
 };
 
 export const SearchLyrics = () => {
-  const [searchParams, setSearchParams] = useState<SearchParams>({
-    title: "",
-    artist: "",
-  });
+  const [searchInput, setSearchInput] = useState("");
   const [isSearching, setIsSearching] = useState(false);
 
   const { data, isLoading, error, refetch } = useQuery({
-    queryKey: ["lyrics", searchParams],
-    queryFn: () => fetchLyrics(searchParams),
+    queryKey: ["lyrics", searchInput],
+    queryFn: () => {
+      const [artist, title] = searchInput.split("-").map((s) => s.trim());
+      return fetchLyrics({ artist, title });
+    },
     enabled: false,
   });
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!searchParams.title || !searchParams.artist) {
-      toast.error("Please enter both artist and title");
+    if (!searchInput.includes("-")) {
+      toast.error("Please enter search in format: Artist - Title");
       return;
     }
     setIsSearching(true);
@@ -53,24 +51,14 @@ export const SearchLyrics = () => {
       </div>
 
       <form onSubmit={handleSearch} className="space-y-4 mb-8">
-        <div className="flex flex-col md:flex-row gap-4">
+        <div className="flex gap-4">
           <Input
-            placeholder="Artist name"
-            value={searchParams.artist}
-            onChange={(e) =>
-              setSearchParams((prev) => ({ ...prev, artist: e.target.value }))
-            }
+            placeholder="Enter search (e.g. The Beatles - Yesterday)"
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
             className="flex-1"
           />
-          <Input
-            placeholder="Song title"
-            value={searchParams.title}
-            onChange={(e) =>
-              setSearchParams((prev) => ({ ...prev, title: e.target.value }))
-            }
-            className="flex-1"
-          />
-          <Button type="submit" className="md:w-auto" disabled={isLoading}>
+          <Button type="submit" className="whitespace-nowrap" disabled={isLoading}>
             <Search className="w-4 h-4 mr-2" />
             Search
           </Button>
@@ -92,9 +80,7 @@ export const SearchLyrics = () => {
       {data && isSearching && (
         <div className="animate-fade-up">
           <div className="bg-white rounded-lg shadow-lg p-8">
-            <h2 className="text-2xl font-bold mb-4">
-              {searchParams.title} - {searchParams.artist}
-            </h2>
+            <h2 className="text-2xl font-bold mb-4">{searchInput}</h2>
             <div className="whitespace-pre-wrap font-serif text-lg leading-relaxed">
               {data.lyrics}
             </div>
