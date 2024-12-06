@@ -20,6 +20,17 @@ const fetchLyrics = async ({ title, artist }: SearchParams) => {
   return response.json();
 };
 
+const formatLyrics = (lyrics: string) => {
+  // Split by newlines, filter out empty lines, and trim each line
+  const lines = lyrics
+    .split("\n")
+    .map(line => line.trim())
+    .filter(line => line.length > 0);
+
+  // Join with single newlines
+  return lines.join("\n");
+};
+
 export const SearchLyrics = () => {
   const [searchInput, setSearchInput] = useState("");
   const [isSearching, setIsSearching] = useState(false);
@@ -91,7 +102,7 @@ export const SearchLyrics = () => {
           <div className="bg-white rounded-lg shadow-lg p-8">
             <h2 className="text-2xl font-bold mb-4">{searchInput}</h2>
             <div className="whitespace-pre-wrap font-serif text-lg leading-relaxed">
-              {data.lyrics}
+              {formatLyrics(data.lyrics)}
             </div>
           </div>
         </div>
