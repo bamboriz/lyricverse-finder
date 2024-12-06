@@ -28,14 +28,23 @@ const fetchLyrics = async ({ title, artist }: SearchParams) => {
 };
 
 const formatLyrics = (lyrics: string) => {
-  // Split by newlines, filter out empty lines, and trim each line
-  const lines = lyrics
-    .split("\n")
-    .map(line => line.trim())
-    .filter(line => line.length > 0);
-
-  // Join with single newlines
-  return lines.join("\n");
+  // Split the lyrics into verses (double newlines indicate verse breaks)
+  const verses = lyrics.split(/\n\s*\n/);
+  
+  // Process each verse
+  const formattedVerses = verses.map(verse => {
+    // Split verse into lines, trim each line, and filter out empty lines
+    const lines = verse
+      .split('\n')
+      .map(line => line.trim())
+      .filter(line => line.length > 0);
+    
+    // Join the lines back together with single newlines
+    return lines.join('\n');
+  });
+  
+  // Join verses back together with double newlines to maintain verse separation
+  return formattedVerses.filter(verse => verse.length > 0).join('\n\n');
 };
 
 export const SearchLyrics = () => {
