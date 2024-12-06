@@ -27,7 +27,16 @@ export const SearchLyrics = () => {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ["lyrics", searchInput],
     queryFn: () => {
-      const [artist, title] = searchInput.split("-").map((s) => s.trim());
+      let artist = "", title = "";
+      
+      if (searchInput.includes("-")) {
+        [artist, title] = searchInput.split("-").map((s) => s.trim());
+      } else {
+        // If no dash, try as both artist and title
+        artist = searchInput.trim();
+        title = searchInput.trim();
+      }
+      
       return fetchLyrics({ artist, title });
     },
     enabled: false,
@@ -35,8 +44,8 @@ export const SearchLyrics = () => {
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!searchInput.includes("-")) {
-      toast.error("Please enter search in format: Artist - Title");
+    if (!searchInput.trim()) {
+      toast.error("Please enter an artist or song title");
       return;
     }
     setIsSearching(true);
@@ -53,7 +62,7 @@ export const SearchLyrics = () => {
       <form onSubmit={handleSearch} className="space-y-4 mb-8">
         <div className="flex gap-4">
           <Input
-            placeholder="Enter search (e.g. The Beatles - Yesterday)"
+            placeholder="Enter artist and/or title (e.g. The Beatles - Yesterday or just Yesterday)"
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
             className="flex-1"
