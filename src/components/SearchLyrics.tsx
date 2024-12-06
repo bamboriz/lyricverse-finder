@@ -14,10 +14,17 @@ const fetchLyrics = async ({ title, artist }: SearchParams) => {
   const response = await fetch(
     `https://api.lyrics.ovh/v1/${encodeURIComponent(artist)}/${encodeURIComponent(title)}`
   );
-  if (!response.ok) {
-    throw new Error("Lyrics not found");
+  
+  if (response.status === 404) {
+    throw new Error("No lyrics found for this song. Please check the artist and title, or try a different song.");
   }
-  return response.json();
+  
+  if (!response.ok) {
+    throw new Error("An error occurred while fetching the lyrics. Please try again later.");
+  }
+
+  const data = await response.json();
+  return data;
 };
 
 const formatLyrics = (lyrics: string) => {
@@ -93,7 +100,7 @@ export const SearchLyrics = () => {
 
       {error && (
         <div className="text-center py-8 text-red-500">
-          Sorry, we couldn't find lyrics for this song.
+          {error instanceof Error ? error.message : "An error occurred while fetching the lyrics."}
         </div>
       )}
 
