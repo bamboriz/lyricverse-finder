@@ -76,22 +76,6 @@ export const SearchLyrics = () => {
     enabled: false,
   });
 
-  const handleSearch = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!searchInput.trim()) {
-      toast.error("Please enter an artist or song title");
-      return;
-    }
-    setIsSearching(true);
-    setInterpretation(null);
-    await refetch();
-    
-    // Automatically get interpretation if API key exists
-    if (apiKey && data?.lyrics) {
-      handleGetInterpretation();
-    }
-  };
-
   const handleGetInterpretation = async () => {
     if (!apiKey) {
       toast.error("Please enter your OpenAI API key first");
@@ -111,6 +95,24 @@ export const SearchLyrics = () => {
       toast.error(error instanceof Error ? error.message : "Failed to get interpretation");
     } finally {
       setIsLoadingInterpretation(false);
+    }
+  };
+
+  const handleSearch = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!searchInput.trim()) {
+      toast.error("Please enter an artist or song title");
+      return;
+    }
+    setIsSearching(true);
+    setInterpretation(null);
+    try {
+      const result = await refetch();
+      if (result.data && apiKey) {
+        await handleGetInterpretation();
+      }
+    } catch (error) {
+      // Error is already handled by the query
     }
   };
 
