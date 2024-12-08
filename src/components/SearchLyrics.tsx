@@ -47,15 +47,11 @@ const getAIInterpretation = async (lyrics: string, apiKey: string) => {
 };
 
 const formatLyrics = (lyrics: string) => {
-  const verses = lyrics.split("\n\n");
-  const formattedVerses = verses.map(verse => {
-    const lines = verse
-      .split("\n")
-      .map(line => line.trim())
-      .filter(line => line.length > 0);
-    return lines.join("\n");
-  }).filter(verse => verse.length > 0);
-  return formattedVerses.join("\n\n");
+  return lyrics
+    .split("\n")
+    .map(line => line.trim())
+    .filter(line => line.length > 0)
+    .join("\n");
 };
 
 export const SearchLyrics = () => {
@@ -63,6 +59,7 @@ export const SearchLyrics = () => {
   const [isSearching, setIsSearching] = useState(false);
   const [apiKey, setApiKey] = useState(() => localStorage.getItem("openai_api_key") || "");
   const [interpretation, setInterpretation] = useState<string | null>(null);
+  const [isLoadingInterpretation, setIsLoadingInterpretation] = useState(false);
 
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ["lyrics", searchInput],
@@ -88,6 +85,11 @@ export const SearchLyrics = () => {
     setIsSearching(true);
     setInterpretation(null);
     await refetch();
+    
+    // Automatically get interpretation if API key exists
+    if (apiKey && data?.lyrics) {
+      handleGetInterpretation();
+    }
   };
 
   const handleGetInterpretation = async () => {
@@ -101,11 +103,14 @@ export const SearchLyrics = () => {
     }
     
     try {
+      setIsLoadingInterpretation(true);
       localStorage.setItem("openai_api_key", apiKey);
       const result = await getAIInterpretation(data.lyrics, apiKey);
       setInterpretation(result);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Failed to get interpretation");
+    } finally {
+      setIsLoadingInterpretation(false);
     }
   };
 
@@ -139,6 +144,7 @@ export const SearchLyrics = () => {
           <LyricsDisplay 
             lyrics={formatLyrics(data.lyrics)} 
             interpretation={interpretation}
+            isLoadingInterpretation={isLoadingInterpretation}
           />
         </div>
       )}
