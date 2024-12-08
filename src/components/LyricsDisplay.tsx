@@ -12,7 +12,7 @@ export const LyricsDisplay = ({ lyrics, interpretation }: LyricsDisplayProps) =>
       <Card className="p-6 bg-white/50 backdrop-blur-sm border-accent">
         <h2 className="text-2xl font-bold mb-4 text-primary">Lyrics</h2>
         <ScrollArea className="h-[600px] w-full pr-4">
-          <div className="whitespace-pre-wrap font-serif text-lg leading-relaxed">
+          <div className="whitespace-pre-wrap font-serif text-lg leading-relaxed space-y-4">
             {lyrics}
           </div>
         </ScrollArea>
