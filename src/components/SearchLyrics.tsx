@@ -63,7 +63,7 @@ export const SearchLyrics = () => {
 
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ["lyrics", searchInput],
-    queryFn: () => {
+    queryFn: async () => {
       let artist = "", title = "";
       if (searchInput.includes("-")) {
         [artist, title] = searchInput.split("-").map((s) => s.trim());
@@ -71,7 +71,22 @@ export const SearchLyrics = () => {
         artist = searchInput.trim();
         title = searchInput.trim();
       }
-      return fetchLyrics({ artist, title });
+      const result = await fetchLyrics({ artist, title });
+      
+      // Automatically fetch interpretation if we have lyrics and an API key
+      if (result.lyrics && apiKey) {
+        try {
+          setIsLoadingInterpretation(true);
+          const interpretationResult = await getAIInterpretation(result.lyrics, apiKey);
+          setInterpretation(interpretationResult);
+        } catch (error) {
+          toast.error(error instanceof Error ? error.message : "Failed to get interpretation");
+        } finally {
+          setIsLoadingInterpretation(false);
+        }
+      }
+      
+      return result;
     },
     enabled: false,
   });
@@ -107,10 +122,7 @@ export const SearchLyrics = () => {
     setIsSearching(true);
     setInterpretation(null);
     try {
-      const result = await refetch();
-      if (result.data && apiKey) {
-        await handleGetInterpretation();
-      }
+      await refetch();
     } catch (error) {
       // Error is already handled by the query
     }
