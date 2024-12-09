@@ -7,9 +7,11 @@ import { toast } from "sonner";
 
 interface LyricCardsProps {
   lyrics: string;
+  songTitle?: string;
+  artist?: string;
 }
 
-export const LyricCards = ({ lyrics }: LyricCardsProps) => {
+export const LyricCards = ({ lyrics, songTitle = "Unknown Song", artist = "Unknown Artist" }: LyricCardsProps) => {
   const [selectedLyric, setSelectedLyric] = useState("");
   const [customLyric, setCustomLyric] = useState("");
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -37,12 +39,12 @@ export const LyricCards = ({ lyrics }: LyricCardsProps) => {
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // Add text
+    // Add main lyric text
     ctx.fillStyle = "white";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     
-    // Set font and size
+    // Set font and size for main lyric
     const fontSize = Math.min(60, 1000 / (customLyric.length / 2));
     ctx.font = `bold ${fontSize}px Inter`;
 
@@ -63,7 +65,7 @@ export const LyricCards = ({ lyrics }: LyricCardsProps) => {
     }
     lines.push(currentLine);
 
-    // Draw text lines
+    // Draw main lyric lines
     const lineHeight = fontSize * 1.2;
     const totalHeight = lines.length * lineHeight;
     const startY = (canvas.height - totalHeight) / 2;
@@ -71,6 +73,15 @@ export const LyricCards = ({ lyrics }: LyricCardsProps) => {
     lines.forEach((line, i) => {
       ctx.fillText(line, canvas.width / 2, startY + i * lineHeight);
     });
+
+    // Add song metadata
+    ctx.font = "20px Inter";
+    ctx.textAlign = "right";
+    ctx.fillStyle = "rgba(255, 255, 255, 0.8)";
+    
+    // Draw song title and artist
+    const metadata = `${songTitle} - ${artist}`;
+    ctx.fillText(metadata, canvas.width - 40, canvas.height - 30);
 
     return canvas.toDataURL("image/png");
   };

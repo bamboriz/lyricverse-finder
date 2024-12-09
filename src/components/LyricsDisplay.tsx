@@ -5,9 +5,17 @@ interface LyricsDisplayProps {
   lyrics: string;
   interpretation: string | null;
   isLoadingInterpretation: boolean;
+  songTitle?: string;
+  artist?: string;
 }
 
-export const LyricsDisplay = ({ lyrics, interpretation, isLoadingInterpretation }: LyricsDisplayProps) => {
+export const LyricsDisplay = ({ 
+  lyrics, 
+  interpretation, 
+  isLoadingInterpretation,
+  songTitle,
+  artist
+}: LyricsDisplayProps) => {
   return (
     <div className="space-y-6 max-w-7xl mx-auto px-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -36,7 +44,7 @@ export const LyricsDisplay = ({ lyrics, interpretation, isLoadingInterpretation 
         </Card>
       </div>
 
-      <LyricCards lyrics={lyrics} />
+      <LyricCards lyrics={lyrics} songTitle={songTitle} artist={artist} />
     </div>
   );
 };
