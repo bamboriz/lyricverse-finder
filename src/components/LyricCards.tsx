@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -12,17 +12,86 @@ interface LyricCardsProps {
 export const LyricCards = ({ lyrics }: LyricCardsProps) => {
   const [selectedLyric, setSelectedLyric] = useState("");
   const [customLyric, setCustomLyric] = useState("");
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const handleLyricSelect = (line: string) => {
     setSelectedLyric(line);
     setCustomLyric(line);
   };
 
+  const generateLyricImage = () => {
+    const canvas = canvasRef.current;
+    if (!canvas) return null;
+
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return null;
+
+    // Set canvas dimensions
+    canvas.width = 1200;
+    canvas.height = 630;
+
+    // Create gradient background
+    const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+    gradient.addColorStop(0, "#8B5CF6");
+    gradient.addColorStop(1, "#D6BCFA");
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Add text
+    ctx.fillStyle = "white";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    
+    // Set font and size
+    const fontSize = Math.min(60, 1000 / (customLyric.length / 2));
+    ctx.font = `bold ${fontSize}px Inter`;
+
+    // Word wrap text
+    const words = customLyric.split(" ");
+    let lines = [];
+    let currentLine = words[0];
+
+    for (let i = 1; i < words.length; i++) {
+      const word = words[i];
+      const width = ctx.measureText(currentLine + " " + word).width;
+      if (width < canvas.width - 100) {
+        currentLine += " " + word;
+      } else {
+        lines.push(currentLine);
+        currentLine = word;
+      }
+    }
+    lines.push(currentLine);
+
+    // Draw text lines
+    const lineHeight = fontSize * 1.2;
+    const totalHeight = lines.length * lineHeight;
+    const startY = (canvas.height - totalHeight) / 2;
+
+    lines.forEach((line, i) => {
+      ctx.fillText(line, canvas.width / 2, startY + i * lineHeight);
+    });
+
+    return canvas.toDataURL("image/png");
+  };
+
   const handleShare = async () => {
     try {
+      const imageUrl = generateLyricImage();
+      if (!imageUrl) {
+        toast.error("Failed to generate image");
+        return;
+      }
+
+      // Convert base64 to blob
+      const response = await fetch(imageUrl);
+      const blob = await response.blob();
+
+      // Share the image
       await navigator.share({
         title: "Shared Lyric",
         text: customLyric,
+        files: [new File([blob], "lyric.png", { type: "image/png" })],
       });
       toast.success("Lyric shared successfully!");
     } catch (error) {
@@ -33,16 +102,19 @@ export const LyricCards = ({ lyrics }: LyricCardsProps) => {
   };
 
   const handleDownload = () => {
-    // In a real implementation, this would generate an image
-    // For now, we'll just download the text
-    const element = document.createElement("a");
-    const file = new Blob([customLyric], { type: "text/plain" });
-    element.href = URL.createObjectURL(file);
-    element.download = "lyric.txt";
-    document.body.appendChild(element);
-    element.click();
-    document.body.removeChild(element);
-    toast.success("Lyric downloaded!");
+    const imageUrl = generateLyricImage();
+    if (!imageUrl) {
+      toast.error("Failed to generate image");
+      return;
+    }
+
+    const link = document.createElement("a");
+    link.download = "lyric.png";
+    link.href = imageUrl;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    toast.success("Lyric image downloaded!");
   };
 
   return (
@@ -98,6 +170,12 @@ export const LyricCards = ({ lyrics }: LyricCardsProps) => {
           </Card>
         </div>
       </div>
+      <canvas
+        ref={canvasRef}
+        className="hidden"
+        width="1200"
+        height="630"
+      />
     </div>
   );
 };
