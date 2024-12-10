@@ -27,7 +27,7 @@ const getAIInterpretation = async (lyrics: string, apiKey: string) => {
   
   try {
     const response = await openai.chat.completions.create({
-      model: "gpt-4",
+      model: "gpt-4o",
       messages: [{
         role: "system",
         content: "You are a music expert who provides concise interpretations of song lyrics. Focus on the main themes, symbolism, and meaning."
@@ -60,6 +60,7 @@ export const SearchLyrics = () => {
   const [apiKey, setApiKey] = useState(() => localStorage.getItem("openai_api_key") || "");
   const [interpretation, setInterpretation] = useState<string | null>(null);
   const [isLoadingInterpretation, setIsLoadingInterpretation] = useState(false);
+  const [currentSong, setCurrentSong] = useState({ title: "", artist: "" });
 
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ["lyrics", searchInput],
@@ -71,9 +72,9 @@ export const SearchLyrics = () => {
         artist = searchInput.trim();
         title = searchInput.trim();
       }
+      setCurrentSong({ title, artist });
       const result = await fetchLyrics({ artist, title });
       
-      // Automatically fetch interpretation if we have lyrics and an API key
       if (result.lyrics && apiKey) {
         try {
           setIsLoadingInterpretation(true);
@@ -159,6 +160,8 @@ export const SearchLyrics = () => {
             lyrics={formatLyrics(data.lyrics)} 
             interpretation={interpretation}
             isLoadingInterpretation={isLoadingInterpretation}
+            songTitle={currentSong.title}
+            artist={currentSong.artist}
           />
         </div>
       )}
