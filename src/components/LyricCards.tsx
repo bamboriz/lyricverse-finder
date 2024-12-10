@@ -28,9 +28,9 @@ export const LyricCards = ({ lyrics, songTitle = "Unknown Song", artist = "Unkno
     const ctx = canvas.getContext("2d");
     if (!ctx) return null;
 
-    // Set canvas dimensions to portrait format (9:16 ratio like TikTok)
-    canvas.width = 1080;  // Standard TikTok width
-    canvas.height = 1920; // Standard TikTok height
+    // Set canvas dimensions (keeping 9:16 ratio)
+    canvas.width = 1080;
+    canvas.height = 1920;
 
     // Create gradient background
     const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
@@ -44,11 +44,11 @@ export const LyricCards = ({ lyrics, songTitle = "Unknown Song", artist = "Unkno
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     
-    // Set font and size for main lyric
-    const fontSize = Math.min(72, 800 / (customLyric.length / 2));
+    // Adjust font size based on text length
+    const fontSize = Math.min(84, 1000 / (customLyric.length / 2));
     ctx.font = `bold ${fontSize}px Inter`;
 
-    // Word wrap text
+    // Word wrap text with improved spacing
     const words = customLyric.split(" ");
     let lines = [];
     let currentLine = words[0];
@@ -56,7 +56,7 @@ export const LyricCards = ({ lyrics, songTitle = "Unknown Song", artist = "Unkno
     for (let i = 1; i < words.length; i++) {
       const word = words[i];
       const width = ctx.measureText(currentLine + " " + word).width;
-      if (width < canvas.width - 120) {
+      if (width < canvas.width - 160) {
         currentLine += " " + word;
       } else {
         lines.push(currentLine);
@@ -65,23 +65,23 @@ export const LyricCards = ({ lyrics, songTitle = "Unknown Song", artist = "Unkno
     }
     lines.push(currentLine);
 
-    // Draw main lyric lines
+    // Draw main lyric lines with reduced spacing
     const lineHeight = fontSize * 1.2;
     const totalHeight = lines.length * lineHeight;
-    const startY = (canvas.height - totalHeight) / 2;
+    const startY = canvas.height * 0.4; // Position text higher up
 
     lines.forEach((line, i) => {
       ctx.fillText(line, canvas.width / 2, startY + i * lineHeight);
     });
 
-    // Add song metadata
-    ctx.font = "32px Inter";
-    ctx.textAlign = "right";
-    ctx.fillStyle = "rgba(255, 255, 255, 0.8)";
+    // Add song metadata with improved positioning
+    ctx.font = "bold 48px Inter";
+    ctx.textAlign = "center";
+    ctx.fillStyle = "rgba(255, 255, 255, 0.9)";
     
-    // Draw song title and artist
+    // Draw song title and artist at the bottom with less spacing
     const metadata = `${songTitle} - ${artist}`;
-    ctx.fillText(metadata, canvas.width - 60, canvas.height - 60);
+    ctx.fillText(metadata, canvas.width / 2, canvas.height - 120);
 
     return canvas.toDataURL("image/png");
   };
