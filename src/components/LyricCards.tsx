@@ -28,9 +28,9 @@ export const LyricCards = ({ lyrics, songTitle = "Unknown Song", artist = "Unkno
     const ctx = canvas.getContext("2d");
     if (!ctx) return null;
 
-    // Set canvas dimensions
-    canvas.width = 1200;
-    canvas.height = 630;
+    // Set canvas dimensions to portrait format (9:16 ratio like TikTok)
+    canvas.width = 1080;  // Standard TikTok width
+    canvas.height = 1920; // Standard TikTok height
 
     // Create gradient background
     const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
@@ -45,7 +45,7 @@ export const LyricCards = ({ lyrics, songTitle = "Unknown Song", artist = "Unkno
     ctx.textBaseline = "middle";
     
     // Set font and size for main lyric
-    const fontSize = Math.min(60, 1000 / (customLyric.length / 2));
+    const fontSize = Math.min(72, 800 / (customLyric.length / 2));
     ctx.font = `bold ${fontSize}px Inter`;
 
     // Word wrap text
@@ -56,7 +56,7 @@ export const LyricCards = ({ lyrics, songTitle = "Unknown Song", artist = "Unkno
     for (let i = 1; i < words.length; i++) {
       const word = words[i];
       const width = ctx.measureText(currentLine + " " + word).width;
-      if (width < canvas.width - 100) {
+      if (width < canvas.width - 120) {
         currentLine += " " + word;
       } else {
         lines.push(currentLine);
@@ -75,13 +75,13 @@ export const LyricCards = ({ lyrics, songTitle = "Unknown Song", artist = "Unkno
     });
 
     // Add song metadata
-    ctx.font = "20px Inter";
+    ctx.font = "32px Inter";
     ctx.textAlign = "right";
     ctx.fillStyle = "rgba(255, 255, 255, 0.8)";
     
     // Draw song title and artist
     const metadata = `${songTitle} - ${artist}`;
-    ctx.fillText(metadata, canvas.width - 40, canvas.height - 30);
+    ctx.fillText(metadata, canvas.width - 60, canvas.height - 60);
 
     return canvas.toDataURL("image/png");
   };
@@ -184,8 +184,8 @@ export const LyricCards = ({ lyrics, songTitle = "Unknown Song", artist = "Unkno
       <canvas
         ref={canvasRef}
         className="hidden"
-        width="1200"
-        height="630"
+        width="1080"
+        height="1920"
       />
     </div>
   );
