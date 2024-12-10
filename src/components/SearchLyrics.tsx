@@ -1,9 +1,10 @@
-import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { toast } from "sonner";
+import { Toaster } from "@/components/ui/toaster";
 import OpenAI from "openai";
+import { toast } from "sonner";
 import { SearchHeader } from "./SearchHeader";
 import { LyricsDisplay } from "./LyricsDisplay";
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 
 const fetchLyrics = async ({ title, artist }: { title: string; artist: string }) => {
   const response = await fetch(
@@ -22,18 +23,18 @@ const fetchLyrics = async ({ title, artist }: { title: string; artist: string })
   return data;
 };
 
-const getAIInterpretation = async (lyrics: string, apiKey: string) => {
+const getAIInterpretation = async (lyrics: string, apiKey: string, songTitle: string, artist: string) => {
   const openai = new OpenAI({ apiKey, dangerouslyAllowBrowser: true });
   
   try {
     const response = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo",
+      model: "gpt-4o-mini",
       messages: [{
         role: "system",
         content: "You are a music expert who provides concise interpretations of song lyrics. Focus on the main themes, symbolism, and meaning."
       }, {
         role: "user",
-        content: `Please interpret these lyrics concisely:\n\n${lyrics}`
+        content: `Please interpret the lyrics of "${songTitle}" by ${artist}:\n\n${lyrics}`
       }],
       temperature: 0.7,
       max_tokens: 500
@@ -78,7 +79,7 @@ export const SearchLyrics = () => {
       if (result.lyrics && apiKey) {
         try {
           setIsLoadingInterpretation(true);
-          const interpretationResult = await getAIInterpretation(result.lyrics, apiKey);
+          const interpretationResult = await getAIInterpretation(result.lyrics, apiKey, title, artist);
           setInterpretation(interpretationResult);
         } catch (error) {
           toast.error(error instanceof Error ? error.message : "Failed to get interpretation");
@@ -105,7 +106,7 @@ export const SearchLyrics = () => {
     try {
       setIsLoadingInterpretation(true);
       localStorage.setItem("openai_api_key", apiKey);
-      const result = await getAIInterpretation(data.lyrics, apiKey);
+      const result = await getAIInterpretation(data.lyrics, apiKey, currentSong.title, currentSong.artist);
       setInterpretation(result);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Failed to get interpretation");
