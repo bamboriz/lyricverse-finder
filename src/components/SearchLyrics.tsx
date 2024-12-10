@@ -27,7 +27,7 @@ const getAIInterpretation = async (lyrics: string, apiKey: string) => {
   
   try {
     const response = await openai.chat.completions.create({
-      model: "gpt-4o",
+      model: "gpt-3.5-turbo",
       messages: [{
         role: "system",
         content: "You are a music expert who provides concise interpretations of song lyrics. Focus on the main themes, symbolism, and meaning."
