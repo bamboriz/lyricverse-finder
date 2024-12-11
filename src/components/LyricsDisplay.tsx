@@ -35,9 +35,9 @@ export const LyricsDisplay = ({
                 <div className="animate-pulse text-primary">Analyzing lyrics...</div>
               </div>
             ) : interpretation ? (
-              <ReactMarkdown className="whitespace-pre-wrap">
+              <div className="whitespace-pre-wrap">
                 {interpretation}
-              </ReactMarkdown>
+              </div>
             ) : (
               <div className="text-gray-500 italic">
                 Click "Get AI Interpretation" to analyze these lyrics
