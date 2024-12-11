@@ -28,9 +28,9 @@ export const LyricCards = ({ lyrics, songTitle = "Unknown Song", artist = "Unkno
     const ctx = canvas.getContext("2d");
     if (!ctx) return null;
 
-    // Set canvas dimensions (keeping 9:16 ratio)
+    // Set canvas dimensions to square format
     canvas.width = 1080;
-    canvas.height = 1920;
+    canvas.height = 1080;
 
     // Create gradient background
     const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
@@ -68,20 +68,20 @@ export const LyricCards = ({ lyrics, songTitle = "Unknown Song", artist = "Unkno
     // Draw main lyric lines with reduced spacing
     const lineHeight = fontSize * 1.2;
     const totalHeight = lines.length * lineHeight;
-    const startY = canvas.height * 0.4; // Position text higher up
+    const startY = canvas.height * 0.4;
 
     lines.forEach((line, i) => {
       ctx.fillText(line, canvas.width / 2, startY + i * lineHeight);
     });
 
     // Add song metadata with improved positioning
-    ctx.font = "bold 48px Inter";
-    ctx.textAlign = "center";
+    ctx.font = "bold 32px Inter";
+    ctx.textAlign = "right";
     ctx.fillStyle = "rgba(255, 255, 255, 0.9)";
     
-    // Draw song title and artist at the bottom with less spacing
+    // Draw song title and artist in bottom right
     const metadata = `${songTitle} - ${artist}`;
-    ctx.fillText(metadata, canvas.width / 2, canvas.height - 120);
+    ctx.fillText(metadata, canvas.width - 40, canvas.height - 40);
 
     return canvas.toDataURL("image/png");
   };
@@ -185,7 +185,7 @@ export const LyricCards = ({ lyrics, songTitle = "Unknown Song", artist = "Unkno
         ref={canvasRef}
         className="hidden"
         width="1080"
-        height="1920"
+        height="1080"
       />
     </div>
   );
