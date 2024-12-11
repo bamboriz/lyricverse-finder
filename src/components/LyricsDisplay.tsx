@@ -1,5 +1,6 @@
 import { Card } from "@/components/ui/card";
 import { LyricCards } from "./LyricCards";
+import ReactMarkdown from "react-markdown";
 
 interface LyricsDisplayProps {
   lyrics: string;
@@ -34,7 +35,9 @@ export const LyricsDisplay = ({
                 <div className="animate-pulse text-primary">Analyzing lyrics...</div>
               </div>
             ) : interpretation ? (
-              <div className="whitespace-pre-wrap">{interpretation}</div>
+              <ReactMarkdown className="whitespace-pre-wrap">
+                {interpretation}
+              </ReactMarkdown>
             ) : (
               <div className="text-gray-500 italic">
                 Click "Get AI Interpretation" to analyze these lyrics
