@@ -74,8 +74,8 @@ export const LyricCards = ({ lyrics, songTitle = "Unknown Song", artist = "Unkno
       ctx.fillText(line, canvas.width / 2, startY + i * lineHeight);
     });
 
-    // Add song metadata with improved positioning
-    ctx.font = "bold 32px Inter";
+    // Add song metadata with improved positioning and thinner font
+    ctx.font = "400 32px Inter";
     ctx.textAlign = "right";
     ctx.fillStyle = "rgba(255, 255, 255, 0.9)";
     
