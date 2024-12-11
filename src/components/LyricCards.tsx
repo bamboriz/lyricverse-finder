@@ -44,9 +44,9 @@ export const LyricCards = ({ lyrics, songTitle = "Unknown Song", artist = "Unkno
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     
-    // Adjust font size based on text length
+    // Adjust font size based on text length and use Merriweather font
     const fontSize = Math.min(84, 1000 / (customLyric.length / 2));
-    ctx.font = `bold ${fontSize}px Inter`;
+    ctx.font = `bold ${fontSize}px Merriweather`;
 
     // Word wrap text with improved spacing
     const words = customLyric.split(" ");
