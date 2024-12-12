@@ -1,9 +1,14 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Download, Share2 } from "lucide-react";
+import { Download, Share2, Palette } from "lucide-react";
 import { toast } from "sonner";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 interface LyricCardsProps {
   lyrics: string;
@@ -11,14 +16,30 @@ interface LyricCardsProps {
   artist?: string;
 }
 
+const colorSuggestions = [
+  { name: "Purple Gradient", from: "#8B5CF6", to: "#D6BCFA" },
+  { name: "Ocean Blue", from: "#0EA5E9", to: "#38BDF8" },
+  { name: "Sunset Orange", from: "#F97316", to: "#FDBA74" },
+  { name: "Forest Green", from: "#22C55E", to: "#86EFAC" },
+  { name: "Rose Pink", from: "#F43F5E", to: "#FDA4AF" },
+];
+
 export const LyricCards = ({ lyrics, songTitle = "Unknown Song", artist = "Unknown Artist" }: LyricCardsProps) => {
   const [selectedLyric, setSelectedLyric] = useState("");
   const [customLyric, setCustomLyric] = useState("");
+  const [gradientFrom, setGradientFrom] = useState("#8B5CF6");
+  const [gradientTo, setGradientTo] = useState("#D6BCFA");
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const previewRef = useRef<HTMLDivElement>(null);
 
   const handleLyricSelect = (line: string) => {
     setSelectedLyric(line);
     setCustomLyric(line);
+  };
+
+  const handleColorSelect = (from: string, to: string) => {
+    setGradientFrom(from);
+    setGradientTo(to);
   };
 
   const generateLyricImage = () => {
@@ -28,27 +49,22 @@ export const LyricCards = ({ lyrics, songTitle = "Unknown Song", artist = "Unkno
     const ctx = canvas.getContext("2d");
     if (!ctx) return null;
 
-    // Set canvas dimensions to square format
     canvas.width = 1080;
     canvas.height = 1080;
 
-    // Create gradient background
     const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
-    gradient.addColorStop(0, "#8B5CF6");
-    gradient.addColorStop(1, "#D6BCFA");
+    gradient.addColorStop(0, gradientFrom);
+    gradient.addColorStop(1, gradientTo);
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // Add main lyric text
     ctx.fillStyle = "white";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     
-    // Adjust font size based on text length and use Merriweather font
     const fontSize = Math.min(84, 1000 / (customLyric.length / 2));
     ctx.font = `bold ${fontSize}px Merriweather`;
 
-    // Word wrap text with improved spacing
     const words = customLyric.split(" ");
     let lines = [];
     let currentLine = words[0];
@@ -65,21 +81,17 @@ export const LyricCards = ({ lyrics, songTitle = "Unknown Song", artist = "Unkno
     }
     lines.push(currentLine);
 
-    // Draw main lyric lines with reduced spacing
     const lineHeight = fontSize * 1.2;
-    const totalHeight = lines.length * lineHeight;
     const startY = canvas.height * 0.4;
 
     lines.forEach((line, i) => {
       ctx.fillText(line, canvas.width / 2, startY + i * lineHeight);
     });
 
-    // Add song metadata with improved positioning and thinner font
     ctx.font = "400 32px Inter";
     ctx.textAlign = "right";
     ctx.fillStyle = "rgba(255, 255, 255, 0.9)";
     
-    // Draw song title and artist in bottom right
     const metadata = `${songTitle} - ${artist}`;
     ctx.fillText(metadata, canvas.width - 40, canvas.height - 40);
 
@@ -94,11 +106,9 @@ export const LyricCards = ({ lyrics, songTitle = "Unknown Song", artist = "Unkno
         return;
       }
 
-      // Convert base64 to blob
       const response = await fetch(imageUrl);
       const blob = await response.blob();
 
-      // Share the image
       await navigator.share({
         title: "Shared Lyric",
         text: customLyric,
@@ -128,6 +138,10 @@ export const LyricCards = ({ lyrics, songTitle = "Unknown Song", artist = "Unkno
     toast.success("Lyric image downloaded!");
   };
 
+  useEffect(() => {
+    generateLyricImage();
+  }, [customLyric, gradientFrom, gradientTo]);
+
   return (
     <div className="mt-8">
       <h2 className="text-2xl font-bold mb-4 text-primary">Create Lyric Card</h2>
@@ -153,13 +167,53 @@ export const LyricCards = ({ lyrics, songTitle = "Unknown Song", artist = "Unkno
           <Card className="p-4 bg-white/50 backdrop-blur-sm border-accent">
             <h3 className="font-semibold mb-2">Customize your lyric</h3>
             <div className="space-y-4">
-              <Input
-                value={customLyric}
-                onChange={(e) => setCustomLyric(e.target.value)}
-                placeholder="Enter or edit your lyric"
-                className="w-full"
-              />
-              <div className="flex gap-2">
+              <div 
+                ref={previewRef}
+                className="relative aspect-square rounded-lg overflow-hidden shadow-lg"
+                style={{
+                  background: `linear-gradient(135deg, ${gradientFrom}, ${gradientTo})`,
+                }}
+              >
+                <textarea
+                  value={customLyric}
+                  onChange={(e) => setCustomLyric(e.target.value)}
+                  className="absolute inset-0 w-full h-full bg-transparent text-white text-center resize-none p-4 focus:outline-none font-serif text-2xl"
+                  style={{
+                    background: 'transparent',
+                    border: 'none',
+                  }}
+                  placeholder="Enter or edit your lyric"
+                />
+              </div>
+              
+              <div className="flex items-center gap-2">
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="outline" className="flex-1">
+                      <Palette className="w-4 h-4 mr-2" />
+                      Change Colors
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-64">
+                    <div className="space-y-2">
+                      {colorSuggestions.map((color, index) => (
+                        <div
+                          key={index}
+                          onClick={() => handleColorSelect(color.from, color.to)}
+                          className="p-2 cursor-pointer hover:bg-accent rounded flex items-center gap-2"
+                        >
+                          <div
+                            className="w-8 h-8 rounded"
+                            style={{
+                              background: `linear-gradient(135deg, ${color.from}, ${color.to})`,
+                            }}
+                          />
+                          <span>{color.name}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </PopoverContent>
+                </Popover>
                 <Button
                   onClick={handleShare}
                   className="flex-1"
