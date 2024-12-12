@@ -3,6 +3,7 @@ import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
 import { ActionButtons } from "./lyric-card/ActionButtons";
 import { LyricPreview } from "./lyric-card/LyricPreview";
+import { generateLyricImage } from "../utils/lyricImageGenerator";
 
 interface LyricCardsProps {
   lyrics: string;
@@ -18,104 +19,20 @@ const colorSuggestions = [
   { name: "Rose Pink", from: "#F43F5E", to: "#FDA4AF" },
 ];
 
-export const LyricCards = ({ 
-  lyrics, 
-  songTitle = "Unknown Song", 
-  artist = "Unknown Artist" 
-}: LyricCardsProps) => {
-  const [selectedLyric, setSelectedLyric] = useState("");
+export const LyricCards = ({ lyrics, songTitle = "Unknown Song", artist = "Unknown Artist" }: LyricCardsProps) => {
   const [customLyric, setCustomLyric] = useState("");
   const [gradientFrom, setGradientFrom] = useState("#8B5CF6");
   const [gradientTo, setGradientTo] = useState("#D6BCFA");
   const canvasRef = useRef<HTMLCanvasElement>(null);
-
-  const handleLyricSelect = (line: string) => {
-    setSelectedLyric(line);
-    setCustomLyric(line);
-  };
 
   const handleColorSelect = (from: string, to: string) => {
     setGradientFrom(from);
     setGradientTo(to);
   };
 
-  const generateLyricImage = () => {
-    const canvas = canvasRef.current;
-    if (!canvas) return null;
-
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return null;
-
-    // Set canvas dimensions
-    canvas.width = 1080;
-    canvas.height = 1080;
-
-    // Draw gradient background
-    const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
-    gradient.addColorStop(0, gradientFrom);
-    gradient.addColorStop(1, gradientTo);
-    ctx.fillStyle = gradient;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    // Text settings
-    ctx.fillStyle = "white";
-    ctx.textAlign = "left";
-    ctx.textBaseline = "middle";
-
-    // Calculate font size based on text length and canvas width
-    const maxWidth = canvas.width * 0.8; // 80% of canvas width
-    const words = customLyric.split(" ");
-    let fontSize = 120; // Start with large font size
-    let lines: string[] = [];
-    
-    // Adjust font size and wrap text
-    do {
-      ctx.font = `bold ${fontSize}px Garamond`;
-      lines = [];
-      let currentLine = words[0];
-      
-      for (let i = 1; i < words.length; i++) {
-        const word = words[i];
-        const testLine = currentLine + " " + word;
-        const metrics = ctx.measureText(testLine);
-        
-        if (metrics.width < maxWidth) {
-          currentLine = testLine;
-        } else {
-          lines.push(currentLine);
-          currentLine = word;
-        }
-      }
-      lines.push(currentLine);
-      
-      fontSize -= 2;
-    } while (lines.length * (fontSize * 1.5) > canvas.height * 0.6 && fontSize > 40);
-
-    // Draw text
-    ctx.font = `bold ${fontSize}px Garamond`;
-    const lineHeight = fontSize * 1.5;
-    const totalTextHeight = lines.length * lineHeight;
-    const startY = (canvas.height - totalTextHeight) / 2;
-
-    lines.forEach((line, i) => {
-      const x = (canvas.width - ctx.measureText(line).width) / 2;
-      const y = startY + (i * lineHeight);
-      ctx.fillText(line, x, y);
-    });
-
-    // Draw metadata
-    ctx.font = "400 32px Inter";
-    ctx.textAlign = "right";
-    ctx.fillStyle = "rgba(255, 255, 255, 0.9)";
-    const metadata = `${songTitle} - ${artist}`;
-    ctx.fillText(metadata, canvas.width - 40, canvas.height - 40);
-
-    return canvas.toDataURL("image/png");
-  };
-
   const handleShare = async () => {
     try {
-      const imageUrl = generateLyricImage();
+      const imageUrl = generateLyricImage(canvasRef, customLyric, gradientFrom, gradientTo, songTitle, artist);
       if (!imageUrl) {
         toast.error("Failed to generate image");
         return;
@@ -138,7 +55,7 @@ export const LyricCards = ({
   };
 
   const handleDownload = () => {
-    const imageUrl = generateLyricImage();
+    const imageUrl = generateLyricImage(canvasRef, customLyric, gradientFrom, gradientTo, songTitle, artist);
     if (!imageUrl) {
       toast.error("Failed to generate image");
       return;
@@ -156,45 +73,24 @@ export const LyricCards = ({
   return (
     <div className="mt-8">
       <h2 className="text-2xl font-bold mb-4 text-primary">Create Lyric Card</h2>
-      <div className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Card className="p-4 bg-white/50 backdrop-blur-sm border-accent">
-            <h3 className="font-semibold mb-2">Select a line</h3>
-            <div className="space-y-2 max-h-60 overflow-y-auto">
-              {lyrics.split("\n").map((line, index) => (
-                line.trim() && (
-                  <div
-                    key={index}
-                    onClick={() => handleLyricSelect(line)}
-                    className="p-2 hover:bg-accent cursor-pointer rounded transition-colors text-left"
-                  >
-                    {line}
-                  </div>
-                )
-              ))}
-            </div>
-          </Card>
+      <Card className="p-4 bg-white/50 backdrop-blur-sm border-accent">
+        <h3 className="font-semibold mb-2">Customize your lyric</h3>
+        <div className="space-y-4">
+          <LyricPreview
+            customLyric={customLyric}
+            setCustomLyric={setCustomLyric}
+            gradientFrom={gradientFrom}
+            gradientTo={gradientTo}
+          />
           
-          <Card className="p-4 bg-white/50 backdrop-blur-sm border-accent">
-            <h3 className="font-semibold mb-2">Customize your lyric</h3>
-            <div className="space-y-4">
-              <LyricPreview
-                customLyric={customLyric}
-                setCustomLyric={setCustomLyric}
-                gradientFrom={gradientFrom}
-                gradientTo={gradientTo}
-              />
-              
-              <ActionButtons
-                onShare={handleShare}
-                onDownload={handleDownload}
-                onColorSelect={handleColorSelect}
-                colorSuggestions={colorSuggestions}
-              />
-            </div>
-          </Card>
+          <ActionButtons
+            onShare={handleShare}
+            onDownload={handleDownload}
+            onColorSelect={handleColorSelect}
+            colorSuggestions={colorSuggestions}
+          />
         </div>
-      </div>
+      </Card>
       <canvas
         ref={canvasRef}
         className="hidden"
