@@ -31,7 +31,7 @@ const getAIInterpretation = async (lyrics: string, apiKey: string, songTitle: st
       model: "gpt-4o-mini",
       messages: [{
         role: "system",
-        content: "You are a music expert who provides concise interpretations of song lyrics. Focus on the main themes, symbolism, and meaning."
+        content: "You are a music expert who provides concise interpretations of song lyrics. Focus on the main themes, symbolism, and meaning. No Markdown please"
       }, {
         role: "user",
         content: `Please interpret the lyrics of "${songTitle}" by ${artist}:\n\n${lyrics}`
