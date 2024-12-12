@@ -63,7 +63,7 @@ export const LyricCards = ({ lyrics, songTitle = "Unknown Song", artist = "Unkno
     ctx.textBaseline = "middle";
     
     const fontSize = Math.min(84, 1000 / (customLyric.length / 2));
-    ctx.font = `bold ${fontSize}px Merriweather`;
+    ctx.font = `bold ${fontSize}px Garamond`;
 
     const words = customLyric.split(" ");
     let lines = [];
