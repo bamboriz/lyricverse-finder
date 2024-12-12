@@ -12,9 +12,9 @@ export const generateLyricImage = (
   const ctx = canvas.getContext("2d");
   if (!ctx) return null;
 
-  // Set canvas dimensions
-  canvas.width = 1080;
-  canvas.height = 1080;
+  // Set smaller canvas dimensions (reduced from 1080x1080)
+  canvas.width = 800;
+  canvas.height = 800;
 
   // Draw gradient background
   const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
@@ -31,7 +31,7 @@ export const generateLyricImage = (
   // Calculate font size based on text length and canvas width
   const maxWidth = canvas.width * 0.8; // 80% of canvas width
   const words = customLyric.split(" ");
-  let fontSize = 120; // Start with large font size
+  let fontSize = 90; // Slightly reduced from 120
   let lines: string[] = [];
   
   // Adjust font size and wrap text
@@ -55,7 +55,7 @@ export const generateLyricImage = (
     lines.push(currentLine);
     
     fontSize -= 2;
-  } while (lines.length * (fontSize * 1.5) > canvas.height * 0.6 && fontSize > 40);
+  } while (lines.length * (fontSize * 1.5) > canvas.height * 0.6 && fontSize > 30);
 
   // Draw text
   ctx.font = `bold ${fontSize}px Garamond`;
@@ -68,11 +68,11 @@ export const generateLyricImage = (
   });
 
   // Draw metadata
-  ctx.font = "400 32px Inter";
+  ctx.font = "400 24px Inter"; // Reduced from 32px
   ctx.textAlign = "right";
   ctx.fillStyle = "rgba(255, 255, 255, 0.9)";
   const metadata = `${songTitle} - ${artist}`;
-  ctx.fillText(metadata, canvas.width - 40, canvas.height - 40);
+  ctx.fillText(metadata, canvas.width - 30, canvas.height - 30);
 
   return canvas.toDataURL("image/png");
 };

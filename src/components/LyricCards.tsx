@@ -94,8 +94,8 @@ export const LyricCards = ({ lyrics, songTitle = "Unknown Song", artist = "Unkno
       <canvas
         ref={canvasRef}
         className="hidden"
-        width="1080"
-        height="1080"
+        width="800"
+        height="800"
       />
     </div>
   );
