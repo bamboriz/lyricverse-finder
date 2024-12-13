@@ -28,35 +28,44 @@ export const generateLyricImage = (
   ctx.textBaseline = "middle";
 
   // Calculate font size and line spacing
-  const fontSize = 48; // Doubled from preview since canvas is 2x size
-  const lineHeight = fontSize * 1.8; // Match the preview's line-height
+  const fontSize = 48;
+  const lineHeight = fontSize * 1.8;
   ctx.font = `${fontSize}px Garamond`;
 
-  // Split text into lines that fit the canvas width
+  // Split text into paragraphs and then into lines that fit the canvas width
+  const paragraphs = customLyric.split('\n');
   const maxWidth = canvas.width * 0.8;
-  const words = customLyric.split(" ");
-  const lines: string[] = [];
-  let currentLine = words[0];
+  const allLines: string[] = [];
 
-  for (let i = 1; i < words.length; i++) {
-    const word = words[i];
-    const testLine = currentLine + " " + word;
-    const metrics = ctx.measureText(testLine);
+  paragraphs.forEach((paragraph, pIndex) => {
+    const words = paragraph.split(" ");
+    let currentLine = words[0] || "";
 
-    if (metrics.width < maxWidth) {
-      currentLine = testLine;
-    } else {
-      lines.push(currentLine);
-      currentLine = word;
+    for (let i = 1; i < words.length; i++) {
+      const word = words[i];
+      const testLine = currentLine + " " + word;
+      const metrics = ctx.measureText(testLine);
+
+      if (metrics.width < maxWidth) {
+        currentLine = testLine;
+      } else {
+        allLines.push(currentLine);
+        currentLine = word;
+      }
     }
-  }
-  lines.push(currentLine);
+    allLines.push(currentLine);
+    
+    // Add an empty line between paragraphs, except for the last paragraph
+    if (pIndex < paragraphs.length - 1) {
+      allLines.push("");
+    }
+  });
 
   // Draw text centered both vertically and horizontally
-  const totalTextHeight = lines.length * lineHeight;
+  const totalTextHeight = allLines.length * lineHeight;
   const startY = (canvas.height - totalTextHeight) / 2;
 
-  lines.forEach((line, i) => {
+  allLines.forEach((line, i) => {
     ctx.fillText(
       line,
       canvas.width / 2,
