@@ -25,9 +25,9 @@ export const LyricPreview = ({
         style={{
           background: 'transparent',
           border: 'none',
-          fontSize: 'clamp(16px, 3vw, 24px)',
-          lineHeight: '1.4',
-          textAlign: 'left',
+          fontSize: '24px',
+          lineHeight: '1.8',
+          textAlign: 'center',
         }}
         placeholder="Enter or edit your lyric"
       />

@@ -12,7 +12,6 @@ export const generateLyricImage = (
   const ctx = canvas.getContext("2d");
   if (!ctx) return null;
 
-  // Set smaller canvas dimensions (reduced from 1080x1080)
   canvas.width = 800;
   canvas.height = 800;
 
@@ -28,47 +27,45 @@ export const generateLyricImage = (
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
 
-  // Calculate font size based on text length and canvas width
-  const maxWidth = canvas.width * 0.8; // 80% of canvas width
-  const words = customLyric.split(" ");
-  let fontSize = 90; // Slightly reduced from 120
-  let lines: string[] = [];
-  
-  // Adjust font size and wrap text
-  do {
-    ctx.font = `bold ${fontSize}px Garamond`;
-    lines = [];
-    let currentLine = words[0];
-    
-    for (let i = 1; i < words.length; i++) {
-      const word = words[i];
-      const testLine = currentLine + " " + word;
-      const metrics = ctx.measureText(testLine);
-      
-      if (metrics.width < maxWidth) {
-        currentLine = testLine;
-      } else {
-        lines.push(currentLine);
-        currentLine = word;
-      }
-    }
-    lines.push(currentLine);
-    
-    fontSize -= 2;
-  } while (lines.length * (fontSize * 1.5) > canvas.height * 0.6 && fontSize > 30);
+  // Calculate font size and line spacing
+  const fontSize = 48; // Doubled from preview since canvas is 2x size
+  const lineHeight = fontSize * 1.8; // Match the preview's line-height
+  ctx.font = `${fontSize}px Garamond`;
 
-  // Draw text
-  ctx.font = `bold ${fontSize}px Garamond`;
-  const lineHeight = fontSize * 1.5;
+  // Split text into lines that fit the canvas width
+  const maxWidth = canvas.width * 0.8;
+  const words = customLyric.split(" ");
+  const lines: string[] = [];
+  let currentLine = words[0];
+
+  for (let i = 1; i < words.length; i++) {
+    const word = words[i];
+    const testLine = currentLine + " " + word;
+    const metrics = ctx.measureText(testLine);
+
+    if (metrics.width < maxWidth) {
+      currentLine = testLine;
+    } else {
+      lines.push(currentLine);
+      currentLine = word;
+    }
+  }
+  lines.push(currentLine);
+
+  // Draw text centered both vertically and horizontally
   const totalTextHeight = lines.length * lineHeight;
   const startY = (canvas.height - totalTextHeight) / 2;
 
   lines.forEach((line, i) => {
-    ctx.fillText(line, canvas.width / 2, startY + (i * lineHeight));
+    ctx.fillText(
+      line,
+      canvas.width / 2,
+      startY + (i * lineHeight) + (lineHeight / 2)
+    );
   });
 
   // Draw metadata
-  ctx.font = "400 24px Inter"; // Reduced from 32px
+  ctx.font = "24px Inter";
   ctx.textAlign = "right";
   ctx.fillStyle = "rgba(255, 255, 255, 0.9)";
   const metadata = `${songTitle} - ${artist}`;
