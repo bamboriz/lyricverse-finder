@@ -11,28 +11,28 @@ export type Database = {
     Tables: {
       songs: {
         Row: {
-          id: number
           artist: string
-          title: string
-          lyrics: string
-          interpretation: string | null
           created_at: string
+          id: number
+          interpretation: string | null
+          lyrics: string
+          title: string
         }
         Insert: {
-          id?: number
           artist: string
-          title: string
-          lyrics: string
-          interpretation?: string | null
           created_at?: string
+          id?: number
+          interpretation?: string | null
+          lyrics: string
+          title: string
         }
         Update: {
-          id?: number
           artist?: string
-          title?: string
-          lyrics?: string
-          interpretation?: string | null
           created_at?: string
+          id?: number
+          interpretation?: string | null
+          lyrics?: string
+          title?: string
         }
         Relationships: []
       }
