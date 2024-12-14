@@ -6,35 +6,10 @@ export type Json =
   | { [key: string]: Json | undefined }
   | Json[]
 
-export interface Database {
+export type Database = {
   public: {
     Tables: {
-      songs: {
-        Row: {
-          id: number
-          artist: string
-          title: string
-          lyrics: string
-          interpretation: string | null
-          created_at: string
-        }
-        Insert: {
-          id?: number
-          artist: string
-          title: string
-          lyrics: string
-          interpretation?: string | null
-          created_at?: string
-        }
-        Update: {
-          id?: number
-          artist?: string
-          title?: string
-          lyrics?: string
-          interpretation?: string | null
-          created_at?: string
-        }
-      }
+      [_ in never]: never
     }
     Views: {
       [_ in never]: never
