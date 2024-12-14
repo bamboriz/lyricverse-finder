@@ -15,6 +15,11 @@ export const fetchFromDatabase = async (artist: string, title: string) => {
     return null;
   }
 
+  // Increment hits for the song
+  if (data) {
+    await supabase.rpc('increment_song_hits', { song_id: data.id });
+  }
+
   return data;
 };
 

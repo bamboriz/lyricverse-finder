@@ -13,6 +13,7 @@ export type Database = {
         Row: {
           artist: string
           created_at: string
+          hits: number
           id: number
           interpretation: string | null
           lyrics: string
@@ -21,6 +22,7 @@ export type Database = {
         Insert: {
           artist: string
           created_at?: string
+          hits?: number
           id?: number
           interpretation?: string | null
           lyrics: string
@@ -29,6 +31,7 @@ export type Database = {
         Update: {
           artist?: string
           created_at?: string
+          hits?: number
           id?: number
           interpretation?: string | null
           lyrics?: string
@@ -41,7 +44,12 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      increment_song_hits: {
+        Args: {
+          song_id: number
+        }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never
