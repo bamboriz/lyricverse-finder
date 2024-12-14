@@ -1,98 +1,11 @@
 import { Toaster } from "@/components/ui/toaster";
-import OpenAI from "openai";
 import { toast } from "sonner";
 import { SearchHeader } from "./SearchHeader";
 import { LyricsDisplay } from "./LyricsDisplay";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
-
-const fetchFromDatabase = async (artist: string, title: string) => {
-  const { data, error } = await supabase
-    .from('songs')
-    .select('*')
-    .eq('artist', artist)
-    .eq('title', title)
-    .single();
-
-  if (error) {
-    if (error.code !== 'PGRST116') { // PGRST116 is "no rows returned"
-      console.error('Supabase error:', error);
-    }
-    return null;
-  }
-
-  return data;
-};
-
-const saveToDatabase = async (artist: string, title: string, lyrics: string, interpretation: string | null) => {
-  const { error } = await supabase
-    .from('songs')
-    .upsert({
-      artist,
-      title,
-      lyrics,
-      interpretation
-    });
-
-  if (error) {
-    console.error('Error saving to database:', error);
-    throw error;
-  }
-};
-
-const fetchLyrics = async ({ title, artist }: { title: string; artist: string }) => {
-  // First, try to get from database
-  const dbSong = await fetchFromDatabase(artist, title);
-  if (dbSong) {
-    return dbSong;
-  }
-
-  // If not in database, fetch from API
-  const response = await fetch(
-    `https://api.lyrics.ovh/v1/${encodeURIComponent(artist)}/${encodeURIComponent(title)}`
-  );
-  
-  if (response.status === 404) {
-    throw new Error("No lyrics found for this song. Please check the artist and title, or try a different song.");
-  }
-  
-  if (!response.ok) {
-    throw new Error("An error occurred while fetching the lyrics. Please try again later.");
-  }
-
-  const data = await response.json();
-  return { lyrics: data.lyrics, interpretation: null };
-};
-
-const getAIInterpretation = async (lyrics: string, apiKey: string, songTitle: string, artist: string) => {
-  const openai = new OpenAI({ apiKey, dangerouslyAllowBrowser: true });
-  
-  try {
-    const response = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
-      messages: [{
-        role: "system",
-        content: "You are a music expert who provides concise interpretations of song lyrics. Focus on the main themes, symbolism, and meaning. No Markdown please"
-      }, {
-        role: "user",
-        content: `Please interpret the lyrics of "${songTitle}" by ${artist}:\n\n${lyrics}`
-      }],
-      temperature: 0.7,
-      max_tokens: 500
-    });
-
-    const interpretation = response.choices[0].message.content;
-    
-    // Save the interpretation to the database
-    await saveToDatabase(artist, songTitle, lyrics, interpretation);
-    
-    return interpretation;
-  } catch (error) {
-    console.error('OpenAI API error:', error);
-    throw new Error("Failed to get AI interpretation. Please check your API key and try again.");
-  }
-};
+import { fetchLyrics } from "@/services/songService";
+import { getAIInterpretation } from "@/services/interpretationService";
 
 const formatLyrics = (lyrics: string) => {
   return lyrics
