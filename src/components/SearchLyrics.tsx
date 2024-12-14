@@ -5,8 +5,50 @@ import { SearchHeader } from "./SearchHeader";
 import { LyricsDisplay } from "./LyricsDisplay";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+
+const fetchFromDatabase = async (artist: string, title: string) => {
+  const { data, error } = await supabase
+    .from('songs')
+    .select('*')
+    .eq('artist', artist)
+    .eq('title', title)
+    .single();
+
+  if (error) {
+    if (error.code !== 'PGRST116') { // PGRST116 is "no rows returned"
+      console.error('Supabase error:', error);
+    }
+    return null;
+  }
+
+  return data;
+};
+
+const saveToDatabase = async (artist: string, title: string, lyrics: string, interpretation: string | null) => {
+  const { error } = await supabase
+    .from('songs')
+    .upsert({
+      artist,
+      title,
+      lyrics,
+      interpretation
+    });
+
+  if (error) {
+    console.error('Error saving to database:', error);
+    throw error;
+  }
+};
 
 const fetchLyrics = async ({ title, artist }: { title: string; artist: string }) => {
+  // First, try to get from database
+  const dbSong = await fetchFromDatabase(artist, title);
+  if (dbSong) {
+    return dbSong;
+  }
+
+  // If not in database, fetch from API
   const response = await fetch(
     `https://api.lyrics.ovh/v1/${encodeURIComponent(artist)}/${encodeURIComponent(title)}`
   );
@@ -20,7 +62,7 @@ const fetchLyrics = async ({ title, artist }: { title: string; artist: string })
   }
 
   const data = await response.json();
-  return data;
+  return { lyrics: data.lyrics, interpretation: null };
 };
 
 const getAIInterpretation = async (lyrics: string, apiKey: string, songTitle: string, artist: string) => {
@@ -40,7 +82,12 @@ const getAIInterpretation = async (lyrics: string, apiKey: string, songTitle: st
       max_tokens: 500
     });
 
-    return response.choices[0].message.content;
+    const interpretation = response.choices[0].message.content;
+    
+    // Save the interpretation to the database
+    await saveToDatabase(artist, songTitle, lyrics, interpretation);
+    
+    return interpretation;
   } catch (error) {
     console.error('OpenAI API error:', error);
     throw new Error("Failed to get AI interpretation. Please check your API key and try again.");
@@ -76,7 +123,10 @@ export const SearchLyrics = () => {
       setCurrentSong({ title, artist });
       const result = await fetchLyrics({ artist, title });
       
-      if (result.lyrics && apiKey) {
+      // If we got an interpretation from the database, use it
+      if (result.interpretation) {
+        setInterpretation(result.interpretation);
+      } else if (result.lyrics && apiKey) {
         try {
           setIsLoadingInterpretation(true);
           const interpretationResult = await getAIInterpretation(result.lyrics, apiKey, title, artist);
