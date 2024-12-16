@@ -18,8 +18,8 @@ export const SearchHeader = ({
   return (
     <div className="max-w-3xl mx-auto px-4 mb-12 animate-fade-up">
       <div className="text-center mb-8">
-        <h1 className="text-4xl font-bold mb-3 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-          Lyric Search & Interpretation
+        <h1 className="text-5xl font-bold mb-3 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+          Lyriko
         </h1>
         <p className="text-gray-600">
           Search for your favorite song lyrics and get AI interpretation
