@@ -37,29 +37,23 @@ export const SearchLyrics = () => {
       
       if (result.interpretation) {
         setInterpretation(result.interpretation);
+      } else if (result.lyrics) {
+        // Automatically get interpretation if lyrics are found and no interpretation exists
+        try {
+          setIsLoadingInterpretation(true);
+          const interpretationResult = await getAIInterpretation(result.lyrics, title, artist);
+          setInterpretation(interpretationResult);
+        } catch (error) {
+          toast.error(error instanceof Error ? error.message : "Failed to get interpretation");
+        } finally {
+          setIsLoadingInterpretation(false);
+        }
       }
       
       return result;
     },
     enabled: false,
   });
-
-  const handleGetInterpretation = async () => {
-    if (!data?.lyrics) {
-      toast.error("Please search for lyrics first");
-      return;
-    }
-    
-    try {
-      setIsLoadingInterpretation(true);
-      const result = await getAIInterpretation(data.lyrics, currentSong.title, currentSong.artist);
-      setInterpretation(result);
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Failed to get interpretation");
-    } finally {
-      setIsLoadingInterpretation(false);
-    }
-  };
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -83,8 +77,6 @@ export const SearchLyrics = () => {
         isLoading={isLoading}
         onSearchInputChange={setSearchInput}
         onSearch={handleSearch}
-        onGetInterpretation={handleGetInterpretation}
-        hasLyrics={!!data?.lyrics}
       />
 
       {isLoading && (

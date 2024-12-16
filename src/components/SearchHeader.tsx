@@ -7,8 +7,6 @@ interface SearchHeaderProps {
   isLoading: boolean;
   onSearchInputChange: (value: string) => void;
   onSearch: (e: React.FormEvent) => void;
-  onGetInterpretation: () => void;
-  hasLyrics: boolean;
 }
 
 export const SearchHeader = ({
@@ -16,8 +14,6 @@ export const SearchHeader = ({
   isLoading,
   onSearchInputChange,
   onSearch,
-  onGetInterpretation,
-  hasLyrics,
 }: SearchHeaderProps) => {
   return (
     <div className="max-w-3xl mx-auto px-4 mb-12 animate-fade-up">
@@ -41,17 +37,6 @@ export const SearchHeader = ({
           <Button type="submit" className="whitespace-nowrap" disabled={isLoading}>
             <Search className="w-4 h-4 mr-2" />
             Search
-          </Button>
-        </div>
-        
-        <div className="flex justify-end">
-          <Button 
-            type="button" 
-            onClick={onGetInterpretation}
-            disabled={!hasLyrics}
-            variant="secondary"
-          >
-            Get AI Interpretation
           </Button>
         </div>
       </form>
