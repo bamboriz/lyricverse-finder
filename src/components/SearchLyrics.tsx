@@ -18,7 +18,6 @@ const formatLyrics = (lyrics: string) => {
 export const SearchLyrics = () => {
   const [searchInput, setSearchInput] = useState("");
   const [isSearching, setIsSearching] = useState(false);
-  const [apiKey, setApiKey] = useState(() => localStorage.getItem("openai_api_key") || "");
   const [interpretation, setInterpretation] = useState<string | null>(null);
   const [isLoadingInterpretation, setIsLoadingInterpretation] = useState(false);
   const [currentSong, setCurrentSong] = useState({ title: "", artist: "" });
@@ -36,19 +35,8 @@ export const SearchLyrics = () => {
       setCurrentSong({ title, artist });
       const result = await fetchLyrics({ artist, title });
       
-      // If we got an interpretation from the database, use it
       if (result.interpretation) {
         setInterpretation(result.interpretation);
-      } else if (result.lyrics && apiKey) {
-        try {
-          setIsLoadingInterpretation(true);
-          const interpretationResult = await getAIInterpretation(result.lyrics, apiKey, title, artist);
-          setInterpretation(interpretationResult);
-        } catch (error) {
-          toast.error(error instanceof Error ? error.message : "Failed to get interpretation");
-        } finally {
-          setIsLoadingInterpretation(false);
-        }
       }
       
       return result;
@@ -57,10 +45,6 @@ export const SearchLyrics = () => {
   });
 
   const handleGetInterpretation = async () => {
-    if (!apiKey) {
-      toast.error("Please enter your OpenAI API key first");
-      return;
-    }
     if (!data?.lyrics) {
       toast.error("Please search for lyrics first");
       return;
@@ -68,8 +52,7 @@ export const SearchLyrics = () => {
     
     try {
       setIsLoadingInterpretation(true);
-      localStorage.setItem("openai_api_key", apiKey);
-      const result = await getAIInterpretation(data.lyrics, apiKey, currentSong.title, currentSong.artist);
+      const result = await getAIInterpretation(data.lyrics, currentSong.title, currentSong.artist);
       setInterpretation(result);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Failed to get interpretation");
@@ -97,10 +80,8 @@ export const SearchLyrics = () => {
     <>
       <SearchHeader 
         searchInput={searchInput}
-        apiKey={apiKey}
         isLoading={isLoading}
         onSearchInputChange={setSearchInput}
-        onApiKeyChange={setApiKey}
         onSearch={handleSearch}
         onGetInterpretation={handleGetInterpretation}
         hasLyrics={!!data?.lyrics}

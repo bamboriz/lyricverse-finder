@@ -1,0 +1,67 @@
+import "https://deno.land/x/xhr@0.1.0/mod.ts";
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { saveToDatabase } from "../_shared/db.ts";
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+};
+
+serve(async (req) => {
+  // Handle CORS preflight requests
+  if (req.method === 'OPTIONS') {
+    return new Response(null, { headers: corsHeaders });
+  }
+
+  try {
+    const { lyrics, songTitle, artist } = await req.json();
+    const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
+
+    if (!openAIApiKey) {
+      throw new Error('OpenAI API key not configured');
+    }
+
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${openAIApiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o-mini',
+        messages: [
+          {
+            role: 'system',
+            content: 'You are a music expert who provides concise interpretations of song lyrics. Focus on the main themes, symbolism, and meaning. No Markdown please'
+          },
+          {
+            role: 'user',
+            content: `Please interpret the lyrics of "${songTitle}" by ${artist}:\n\n${lyrics}`
+          }
+        ],
+        temperature: 0.7,
+        max_tokens: 500
+      }),
+    });
+
+    const data = await response.json();
+    const interpretation = data.choices[0].message.content;
+
+    // Save the interpretation to the database
+    await saveToDatabase(artist, songTitle, lyrics, interpretation);
+
+    return new Response(
+      JSON.stringify({ interpretation }),
+      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
+  } catch (error) {
+    console.error('Error in get-interpretation function:', error);
+    return new Response(
+      JSON.stringify({ error: error.message }),
+      { 
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      }
+    );
+  }
+});

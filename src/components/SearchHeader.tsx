@@ -4,10 +4,8 @@ import { Button } from "@/components/ui/button";
 
 interface SearchHeaderProps {
   searchInput: string;
-  apiKey: string;
   isLoading: boolean;
   onSearchInputChange: (value: string) => void;
-  onApiKeyChange: (value: string) => void;
   onSearch: (e: React.FormEvent) => void;
   onGetInterpretation: () => void;
   hasLyrics: boolean;
@@ -15,10 +13,8 @@ interface SearchHeaderProps {
 
 export const SearchHeader = ({
   searchInput,
-  apiKey,
   isLoading,
   onSearchInputChange,
-  onApiKeyChange,
   onSearch,
   onGetInterpretation,
   hasLyrics,
@@ -48,14 +44,7 @@ export const SearchHeader = ({
           </Button>
         </div>
         
-        <div className="flex gap-4 items-center">
-          <Input
-            type="password"
-            placeholder="Enter your OpenAI API key"
-            value={apiKey}
-            onChange={(e) => onApiKeyChange(e.target.value)}
-            className="flex-1"
-          />
+        <div className="flex justify-end">
           <Button 
             type="button" 
             onClick={onGetInterpretation}

@@ -1,31 +1,15 @@
-import OpenAI from "openai";
-import { saveToDatabase } from "./songService";
+import { supabase } from "@/integrations/supabase/client";
 
-export const getAIInterpretation = async (lyrics: string, apiKey: string, songTitle: string, artist: string) => {
-  const openai = new OpenAI({ apiKey, dangerouslyAllowBrowser: true });
-  
+export const getAIInterpretation = async (lyrics: string, songTitle: string, artist: string) => {
   try {
-    const response = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
-      messages: [{
-        role: "system",
-        content: "You are a music expert who provides concise interpretations of song lyrics. Focus on the main themes, symbolism, and meaning. No Markdown please"
-      }, {
-        role: "user",
-        content: `Please interpret the lyrics of "${songTitle}" by ${artist}:\n\n${lyrics}`
-      }],
-      temperature: 0.7,
-      max_tokens: 500
+    const { data, error } = await supabase.functions.invoke('get-interpretation', {
+      body: { lyrics, songTitle, artist }
     });
 
-    const interpretation = response.choices[0].message.content;
-    
-    // Save the interpretation to the database
-    await saveToDatabase(artist, songTitle, lyrics, interpretation);
-    
-    return interpretation;
+    if (error) throw new Error(error.message);
+    return data.interpretation;
   } catch (error) {
-    console.error('OpenAI API error:', error);
-    throw new Error("Failed to get AI interpretation. Please check your API key and try again.");
+    console.error('Error getting AI interpretation:', error);
+    throw new Error("Failed to get AI interpretation. Please try again later.");
   }
 };
