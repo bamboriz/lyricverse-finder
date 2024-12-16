@@ -21,6 +21,7 @@ serve(async (req) => {
       throw new Error('OpenAI API key not configured');
     }
 
+    console.log('Making request to OpenAI API...');
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -45,6 +46,13 @@ serve(async (req) => {
     });
 
     const data = await response.json();
+    console.log('Received response from OpenAI');
+    
+    if (!data.choices || !data.choices[0]) {
+      console.error('Unexpected OpenAI response:', data);
+      throw new Error('Invalid response from OpenAI');
+    }
+
     const interpretation = data.choices[0].message.content;
 
     // Save the interpretation to the database
