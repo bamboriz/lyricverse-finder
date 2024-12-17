@@ -1,6 +1,8 @@
 import { Card } from "@/components/ui/card";
 import { LyricCards } from "./LyricCards";
-import ReactMarkdown from "react-markdown";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { ChevronDown } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface LyricsDisplayProps {
   lyrics: string;
@@ -17,15 +19,35 @@ export const LyricsDisplay = ({
   songTitle,
   artist
 }: LyricsDisplayProps) => {
+  const isMobile = useIsMobile();
+
+  const LyricsContent = () => (
+    <Card className="p-6 bg-white/50 backdrop-blur-sm border-accent">
+      <h2 className="text-2xl font-bold mb-4 text-primary">Lyrics</h2>
+      <div className="whitespace-pre-wrap font-serif text-lg leading-relaxed">
+        {lyrics}
+      </div>
+    </Card>
+  );
+
   return (
     <div className="space-y-6 max-w-7xl mx-auto px-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card className="p-6 bg-white/50 backdrop-blur-sm border-accent">
-          <h2 className="text-2xl font-bold mb-4 text-primary">Lyrics</h2>
-          <div className="whitespace-pre-wrap font-serif text-lg leading-relaxed">
-            {lyrics}
-          </div>
-        </Card>
+        {isMobile ? (
+          <Collapsible>
+            <CollapsibleTrigger className="w-full">
+              <div className="flex items-center justify-between p-4 bg-white/50 backdrop-blur-sm border border-accent rounded-lg">
+                <span className="text-lg font-semibold text-primary">View Lyrics</span>
+                <ChevronDown className="h-5 w-5" />
+              </div>
+            </CollapsibleTrigger>
+            <CollapsibleContent className="mt-2">
+              <LyricsContent />
+            </CollapsibleContent>
+          </Collapsible>
+        ) : (
+          <LyricsContent />
+        )}
 
         <Card className="p-6 bg-white/50 backdrop-blur-sm border-accent">
           <h2 className="text-2xl font-bold mb-4 text-primary">Interpretation</h2>
