@@ -1,3 +1,10 @@
+const capitalizeWords = (str: string) => {
+  return str
+    .split(' ')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+};
+
 export const generateLyricImage = (
   canvasRef: React.RefObject<HTMLCanvasElement>,
   customLyric: string,
@@ -73,11 +80,11 @@ export const generateLyricImage = (
     );
   });
 
-  // Draw metadata
+  // Draw metadata with capitalized text
   ctx.font = "24px Inter";
   ctx.textAlign = "right";
   ctx.fillStyle = "rgba(255, 255, 255, 0.9)";
-  const metadata = `${songTitle} - ${artist}`;
+  const metadata = `${capitalizeWords(songTitle)} - ${capitalizeWords(artist)}`;
   ctx.fillText(metadata, canvas.width - 30, canvas.height - 30);
 
   return canvas.toDataURL("image/png");

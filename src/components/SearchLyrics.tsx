@@ -15,6 +15,10 @@ const formatLyrics = (lyrics: string) => {
     .join("\n");
 };
 
+const normalizeText = (text: string) => {
+  return text.toLowerCase().trim();
+};
+
 export const SearchLyrics = () => {
   const [searchInput, setSearchInput] = useState("");
   const [isSearching, setIsSearching] = useState(false);
@@ -27,10 +31,10 @@ export const SearchLyrics = () => {
     queryFn: async () => {
       let artist = "", title = "";
       if (searchInput.includes("-")) {
-        [artist, title] = searchInput.split("-").map((s) => s.trim());
+        [artist, title] = searchInput.split("-").map((s) => normalizeText(s));
       } else {
-        artist = searchInput.trim();
-        title = searchInput.trim();
+        artist = normalizeText(searchInput);
+        title = normalizeText(searchInput);
       }
       setCurrentSong({ title, artist });
       const result = await fetchLyrics({ artist, title });
@@ -38,7 +42,6 @@ export const SearchLyrics = () => {
       if (result.interpretation) {
         setInterpretation(result.interpretation);
       } else if (result.lyrics) {
-        // Automatically get interpretation if lyrics are found and no interpretation exists
         try {
           setIsLoadingInterpretation(true);
           const interpretationResult = await getAIInterpretation(result.lyrics, title, artist);
