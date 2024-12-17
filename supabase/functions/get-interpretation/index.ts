@@ -33,7 +33,7 @@ serve(async (req) => {
         messages: [
           {
             role: 'system',
-            content: 'You are a music expert who specializes in breaking down song lyrics with engaging, clear, and concise explanations. Provide simple interpretations of each verse, focusing on the main themes, symbolism, and emotional meaning. Use straightforward language that anyone can understand while capturing the essence of the song. Keep it brief, insightful, and engaging'
+            content: 'You are a music expert who specializes in breaking down song lyrics with engaging, clear, and concise explanations. Provide simple interpretations of each verse, focusing on the main themes, symbolism, and emotional meaning. Use straightforward language that anyone can understand while capturing the essence of the song. Keep it brief, insightful, and engaging with NO MARKDOWN!'
           },
           {
             role: 'user',
