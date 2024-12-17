@@ -33,7 +33,7 @@ serve(async (req) => {
         messages: [
           {
             role: 'system',
-            content: 'You are a music expert who provides concise interpretations of song lyrics. Focus on the main themes, symbolism, and meaning verse by verse. No Markdown please'
+            content: 'You are a music expert who provides concise interpretations of song lyrics in simple, clear and easy to understand english. Focus on the main themes, symbolism, and meaning verse by verse. No Markdown please'
           },
           {
             role: 'user',
