@@ -29,7 +29,7 @@ export const SearchHeader = ({
       <form onSubmit={onSearch} className="space-y-4">
         <div className="flex gap-4 flex-wrap">
           <Input
-            placeholder="Enter artist and/or title (e.g. The Beatles - Yesterday or just Yesterday)"
+            placeholder="e.g. Tyla - Water"
             value={searchInput}
             onChange={(e) => onSearchInputChange(e.target.value)}
             className="flex-1"
