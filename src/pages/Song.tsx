@@ -13,41 +13,32 @@ import { generateSlug, parseSlugForDirectAccess, capitalizeForDisplay } from "@/
 export const Song = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { "*": slug } = useParams();
+  const { slug } = useParams();
   const [searchInput, setSearchInput] = useState("");
   const [isSearching, setIsSearching] = useState(false);
   const [artist, setArtist] = useState("");
   const [title, setTitle] = useState("");
   
   useEffect(() => {
-    try {
-      if (location.state?.artist && location.state?.title) {
-        // If coming from search, use the navigation state
-        setArtist(location.state.artist);
-        setTitle(location.state.title);
-      } else if (slug) {
-        // If accessing directly via URL, parse the slug
-        try {
-          const parsed = parseSlugForDirectAccess(slug);
-          setArtist(parsed.artist);
-          setTitle(parsed.title);
-        } catch (error) {
-          console.error('Error parsing slug:', error);
-          toast.error("Invalid song URL");
-          navigate('/');
-          return;
-        }
-      } else {
-        // Only redirect if we have neither state nor slug
-        toast.error("No song information provided");
+    if (location.state?.artist && location.state?.title) {
+      // If coming from search, use the navigation state
+      setArtist(location.state.artist);
+      setTitle(location.state.title);
+    } else if (slug) {
+      // If accessing directly via URL, parse the slug
+      try {
+        const parsed = parseSlugForDirectAccess(slug);
+        setArtist(parsed.artist);
+        setTitle(parsed.title);
+      } catch (error) {
+        console.error('Error parsing slug:', error);
+        toast.error("Invalid song URL");
         navigate('/');
-        return;
       }
-    } catch (error) {
-      console.error('Error getting song info:', error);
-      toast.error("Invalid song URL");
+    } else {
+      // Only redirect if we have neither state nor slug
+      toast.error("No song information provided");
       navigate('/');
-      return;
     }
   }, [location.state, slug, navigate]);
 
@@ -80,7 +71,7 @@ export const Song = () => {
   const { data: song, isLoading } = useQuery({
     queryKey: ['song', artist, title],
     queryFn: async () => {
-      if (!artist || !title) throw new Error('Invalid song URL');
+      if (!artist || !title) return null;
       
       try {
         // First try to get from database
