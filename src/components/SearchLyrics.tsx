@@ -8,11 +8,23 @@ import { fetchLyrics } from "@/services/songService";
 import { useNavigate } from "react-router-dom";
 
 const formatLyrics = (text: string) => {
-  return text
-    .split("\n")
-    .map(line => line.trim())
-    .filter(line => line.length > 0)
-    .join("\n");
+  // Split the lyrics into verses (double newlines indicate verse breaks)
+  const verses = text.split(/\n\s*\n/);
+  
+  // Process each verse
+  const formattedVerses = verses.map(verse => {
+    // Split verse into lines, trim each line, and filter out empty lines
+    const lines = verse
+      .split('\n')
+      .map(line => line.trim())
+      .filter(line => line.length > 0);
+    
+    // Join the lines back together with single newlines
+    return lines.join('\n');
+  });
+  
+  // Join verses back together with double newlines to maintain verse separation
+  return formattedVerses.filter(verse => verse.length > 0).join('\n\n');
 };
 
 // This function is only for URL slugs, not database storage
