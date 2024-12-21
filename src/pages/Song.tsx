@@ -1,78 +1,60 @@
 import { useParams } from "react-router-dom";
-import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { fetchLyrics } from "@/services/songService";
-import { LyricsDisplay } from "@/components/LyricsDisplay";
 import { Helmet } from "react-helmet";
+import { fetchFromDatabase } from "@/services/songService";
+import { LyricsDisplay } from "@/components/LyricsDisplay";
 
-const Song = () => {
-  const { slug } = useParams();
+export const Song = () => {
+  const { slug } = useParams<{ slug: string }>();
   
   // Extract artist and title from the slug
-  const [artist, title] = (slug || "").split("-lyrics-and-meaning")[0].split("-").reduce((acc: string[], word, index, array) => {
-    if (index === array.length - 1) {
-      acc[1] = (acc[1] ? acc[1] + " " : "") + word;
-    } else if (index === array.length - 2) {
-      acc[1] = word;
-    } else {
-      acc[0] = (acc[0] ? acc[0] + " " : "") + word;
-    }
-    return acc;
-  }, ["", ""]);
-
-  const { data, isLoading } = useQuery({
-    queryKey: ["lyrics", artist, title],
+  // Format: artist-title-lyrics-and-meaning
+  const [artist, title] = slug?.split('-lyrics-and-meaning')[0].split('-') || [];
+  
+  const { data: song, isLoading, error } = useQuery({
+    queryKey: ['song', artist, title],
     queryFn: async () => {
-      return await fetchLyrics({ artist, title });
+      if (!artist || !title) throw new Error('Invalid song URL');
+      return fetchFromDatabase(artist, title);
     },
     enabled: !!artist && !!title,
   });
 
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
-
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-accent via-white to-accent/50 py-12">
-        <div className="text-center py-8">
-          <div className="animate-pulse text-primary">Loading song...</div>
-        </div>
+      <div className="text-center py-8">
+        <div className="animate-pulse text-primary">Loading song...</div>
       </div>
     );
   }
 
-  if (!data) {
+  if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-accent via-white to-accent/50 py-12">
-        <div className="text-center py-8 text-red-500">
-          Song not found
-        </div>
+      <div className="text-center py-8 text-red-500">
+        {error instanceof Error ? error.message : "Failed to load song"}
       </div>
     );
   }
 
-  const capitalizedArtist = artist.split(" ").map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(" ");
-  const capitalizedTitle = title.split(" ").map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(" ");
+  if (!song) {
+    return (
+      <div className="text-center py-8 text-red-500">
+        Song not found
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-accent via-white to-accent/50 py-12">
+    <div className="container mx-auto px-4 py-8">
       <Helmet>
-        <title>{`${capitalizedTitle} by ${capitalizedArtist} - Lyrics and Meaning | Lyriko`}</title>
-        <meta name="description" content={`Discover the meaning behind ${capitalizedTitle} by ${capitalizedArtist}. Read lyrics and AI-powered interpretation of this song.`} />
-        <meta property="og:title" content={`${capitalizedTitle} by ${capitalizedArtist} - Lyrics and Meaning`} />
-        <meta property="og:description" content={`Discover the meaning behind ${capitalizedTitle} by ${capitalizedArtist}. Read lyrics and AI-powered interpretation of this song.`} />
+        <title>{`${song.title} by ${song.artist} - Lyrics and Meaning`}</title>
+        <meta name="description" content={`Read the lyrics and meaning of ${song.title} by ${song.artist}. Understand the song's interpretation and significance.`} />
       </Helmet>
       
-      <LyricsDisplay 
-        lyrics={data.lyrics}
-        interpretation={data.interpretation}
-        isLoadingInterpretation={false}
-        songTitle={capitalizedTitle}
-        artist={capitalizedArtist}
-      />
+      <h1 className="text-3xl font-bold mb-4">{song.title}</h1>
+      <h2 className="text-xl text-gray-600 mb-8">by {song.artist}</h2>
+      
+      {song.lyrics && <LyricsDisplay lyrics={song.lyrics} interpretation={song.interpretation} />}
     </div>
   );
 };
-
-export default Song;

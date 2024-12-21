@@ -21,16 +21,15 @@ const normalizeText = (text: string) => {
 };
 
 const generateSlug = (artist: string, title: string) => {
-  return `${artist.toLowerCase().replace(/\s+/g, "-")}-${title.toLowerCase().replace(/\s+/g, "-")}-lyrics-and-meaning`;
+  const normalizedArtist = artist.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+  const normalizedTitle = title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+  return `${normalizedArtist}-${normalizedTitle}-lyrics-and-meaning`;
 };
 
 export const SearchLyrics = () => {
   const navigate = useNavigate();
   const [searchInput, setSearchInput] = useState("");
   const [isSearching, setIsSearching] = useState(false);
-  const [interpretation, setInterpretation] = useState<string | null>(null);
-  const [isLoadingInterpretation, setIsLoadingInterpretation] = useState(false);
-  const [currentSong, setCurrentSong] = useState({ title: "", artist: "" });
 
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ["lyrics", searchInput],
@@ -39,14 +38,15 @@ export const SearchLyrics = () => {
       if (searchInput.includes("-")) {
         [artist, title] = searchInput.split("-").map((s) => normalizeText(s));
       } else {
+        // If no hyphen, assume the entire input is both artist and title
+        // This might need to be adjusted based on your requirements
         artist = normalizeText(searchInput);
         title = normalizeText(searchInput);
       }
-      setCurrentSong({ title, artist });
+      
       const result = await fetchLyrics({ artist, title });
       
       if (result.lyrics) {
-        // Navigate to the song page
         const slug = generateSlug(artist, title);
         navigate(`/songs/${slug}`);
       }
@@ -63,7 +63,6 @@ export const SearchLyrics = () => {
       return;
     }
     setIsSearching(true);
-    setInterpretation(null);
     try {
       await refetch();
     } catch (error) {
