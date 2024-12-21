@@ -16,7 +16,7 @@ export const ActionButtons = ({
   colorSuggestions 
 }: ActionButtonsProps) => {
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full">
       <ColorPicker onColorSelect={onColorSelect} colorSuggestions={colorSuggestions} />
       <Button
         onClick={onShare}
