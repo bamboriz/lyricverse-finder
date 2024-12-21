@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { Index } from "./pages/Index";
+import Index from "./pages/Index";
 import { Song } from "./pages/Song";
 import "./App.css";
 

@@ -54,7 +54,13 @@ export const Song = () => {
       <h1 className="text-3xl font-bold mb-4">{song.title}</h1>
       <h2 className="text-xl text-gray-600 mb-8">by {song.artist}</h2>
       
-      {song.lyrics && <LyricsDisplay lyrics={song.lyrics} interpretation={song.interpretation} />}
+      {song.lyrics && (
+        <LyricsDisplay 
+          lyrics={song.lyrics} 
+          interpretation={song.interpretation} 
+          isLoadingInterpretation={false}
+        />
+      )}
     </div>
   );
 };
