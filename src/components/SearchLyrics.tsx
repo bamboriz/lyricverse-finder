@@ -28,7 +28,7 @@ const parseSearchInput = (input: string): { artist: string; title: string } => {
 const generateSlug = (artist: string, title: string) => {
   const normalizedArtist = artist.toLowerCase().replace(/[^a-z0-9]+/g, '-');
   const normalizedTitle = title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-  return `${normalizedArtist}-${normalizedTitle}-lyrics-and-meaning`;
+  return `${normalizedArtist}--${normalizedTitle}-lyrics-and-meaning`;
 };
 
 export const SearchLyrics = () => {

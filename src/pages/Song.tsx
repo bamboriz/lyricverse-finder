@@ -19,27 +19,27 @@ const capitalizeForDisplay = (text: string): string => {
 const generateSlug = (artist: string, title: string) => {
   const normalizedArtist = artist.toLowerCase().replace(/[^a-z0-9]+/g, '-');
   const normalizedTitle = title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-  return `${normalizedArtist}-${normalizedTitle}-lyrics-and-meaning`;
+  return `${normalizedArtist}--${normalizedTitle}-lyrics-and-meaning`;
 };
 
 const parseSlugForDirectAccess = (slug: string): { artist: string; title: string } => {
   // Remove the "-lyrics-and-meaning" suffix
   const withoutSuffix = slug.replace(/-lyrics-and-meaning$/, '');
   
-  // Convert hyphens back to spaces and clean up the text
-  const cleanText = withoutSuffix
-    .split('-')
-    .join(' ')
-    .toLowerCase();
-
-  // Use the same parsing logic as SearchLyrics to maintain consistency
-  const firstHyphenIndex = cleanText.indexOf(' - ');
-  if (firstHyphenIndex === -1) {
+  // Split by double hyphen to separate artist and title
+  const parts = withoutSuffix.split('--');
+  
+  if (parts.length !== 2) {
     throw new Error('Invalid URL format');
   }
 
-  const artist = cleanText.slice(0, firstHyphenIndex).trim();
-  const title = cleanText.slice(firstHyphenIndex + 2).trim();
+  // Convert hyphens back to spaces for both artist and title
+  const artist = parts[0].replace(/-/g, ' ').trim();
+  const title = parts[1].replace(/-/g, ' ').trim();
+
+  if (!artist || !title) {
+    throw new Error('Invalid URL format');
+  }
 
   return { artist, title };
 };
