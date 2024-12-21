@@ -4,15 +4,15 @@ import { Helmet } from "react-helmet";
 import { fetchFromDatabase, fetchLyrics, saveToDatabase } from "@/services/songService";
 import { LyricsDisplay } from "@/components/LyricsDisplay";
 import { toast } from "sonner";
+import { getAIInterpretation } from "@/services/interpretationService";
 
 export const Song = () => {
   const { slug } = useParams<{ slug: string }>();
   
   // Extract artist and title from the slug
-  // Format: artist-title-lyrics-and-meaning
   const [artist, title] = slug?.split('-lyrics-and-meaning')[0].split('-') || [];
   
-  const { data: song, isLoading, error } = useQuery({
+  const { data: song, isLoading } = useQuery({
     queryKey: ['song', artist, title],
     queryFn: async () => {
       if (!artist || !title) throw new Error('Invalid song URL');
@@ -20,24 +20,41 @@ export const Song = () => {
       try {
         // First try to get from database
         const dbSong = await fetchFromDatabase(artist, title);
-        if (dbSong) {
+        
+        // If we have both lyrics and interpretation, return it
+        if (dbSong?.lyrics && dbSong?.interpretation) {
           return dbSong;
         }
 
-        // If not in database, fetch from API
-        const apiResult = await fetchLyrics({ artist, title });
-        
-        // Save to database for future requests
-        if (apiResult.lyrics) {
-          await saveToDatabase(artist, title, apiResult.lyrics, apiResult.interpretation);
+        // If we have lyrics but no interpretation, get interpretation
+        if (dbSong?.lyrics && !dbSong?.interpretation) {
+          const interpretation = await getAIInterpretation(dbSong.lyrics, title, artist);
+          await saveToDatabase(artist, title, dbSong.lyrics, interpretation);
           return {
-            artist,
-            title,
-            ...apiResult
+            ...dbSong,
+            interpretation
           };
         }
+
+        // If nothing in database, fetch lyrics from API
+        const apiResult = await fetchLyrics({ artist, title });
         
-        throw new Error(`No lyrics found for "${title}" by ${artist}`);
+        if (!apiResult.lyrics) {
+          throw new Error(`No lyrics found for "${title}" by ${artist}`);
+        }
+
+        // Get interpretation for the lyrics
+        const interpretation = await getAIInterpretation(apiResult.lyrics, title, artist);
+        
+        // Save everything to database
+        await saveToDatabase(artist, title, apiResult.lyrics, interpretation);
+        
+        return {
+          artist,
+          title,
+          lyrics: apiResult.lyrics,
+          interpretation
+        };
       } catch (error) {
         console.error('Error fetching song:', error);
         toast.error(error instanceof Error ? error.message : 'Failed to load song');
@@ -55,7 +72,7 @@ export const Song = () => {
     );
   }
 
-  if (error || !song) {
+  if (!song) {
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="text-center py-8">

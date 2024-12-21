@@ -38,20 +38,7 @@ export const getAIInterpretation = async (lyrics: string, songTitle: string, art
     }
 
     const data2 = await response.json();
-    const interpretation = data2.choices[0].message.content;
-
-    // Save the interpretation to the database
-    const { error: dbError } = await supabase
-      .from('songs')
-      .update({ interpretation })
-      .match({ artist, title: songTitle });
-
-    if (dbError) {
-      console.error('Error saving interpretation to database:', dbError);
-      // Don't throw here, we still want to return the interpretation
-    }
-
-    return interpretation;
+    return data2.choices[0].message.content;
   } catch (error) {
     console.error('Error getting AI interpretation:', error);
     throw new Error("Failed to get AI interpretation. Please try again later.");
