@@ -16,20 +16,52 @@ const capitalizeForDisplay = (text: string): string => {
     .join(' ');
 };
 
-const generateSlug = (artist: string, title: string) => {
-  const normalizedArtist = artist.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-  const normalizedTitle = title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-  return `${normalizedArtist}-${normalizedTitle}-lyrics-and-meaning`;
+const parseSlugForDirectAccess = (slug: string): { artist: string; title: string } => {
+  // Remove the "-lyrics-and-meaning" suffix
+  const withoutSuffix = slug.replace(/-lyrics-and-meaning$/, '');
+  
+  // Convert hyphens back to spaces and clean up the text
+  const cleanText = withoutSuffix
+    .split('-')
+    .join(' ')
+    .toLowerCase();
+
+  // Use the same parsing logic as SearchLyrics to maintain consistency
+  const firstHyphenIndex = cleanText.indexOf(' - ');
+  if (firstHyphenIndex === -1) {
+    throw new Error('Invalid URL format');
+  }
+
+  const artist = cleanText.slice(0, firstHyphenIndex).trim();
+  const title = cleanText.slice(firstHyphenIndex + 2).trim();
+
+  return { artist, title };
 };
 
 export const Song = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { "*": slug } = useParams(); // Get the slug from URL params
   const [searchInput, setSearchInput] = useState("");
   const [isSearching, setIsSearching] = useState(false);
   
-  // Get artist and title from navigation state
-  const { artist = '', title = '' } = location.state || {};
+  // Try to get artist and title from navigation state first
+  let artist = '', title = '';
+  
+  if (location.state?.artist && location.state?.title) {
+    // If coming from search, use the navigation state
+    artist = location.state.artist;
+    title = location.state.title;
+  } else if (slug) {
+    // If accessing directly via URL, parse the slug
+    try {
+      const parsed = parseSlugForDirectAccess(slug);
+      artist = parsed.artist;
+      title = parsed.title;
+    } catch (error) {
+      console.error('Error parsing slug:', error);
+    }
+  }
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
