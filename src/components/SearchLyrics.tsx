@@ -7,8 +7,8 @@ import { useQuery } from "@tanstack/react-query";
 import { fetchLyrics, saveToDatabase, fetchFromDatabase } from "@/services/songService";
 import { useNavigate } from "react-router-dom";
 
-const formatLyrics = (lyrics: string) => {
-  return lyrics
+const formatLyrics = (text: string) => {
+  return text
     .split("\n")
     .map(line => line.trim())
     .filter(line => line.length > 0)
@@ -31,17 +31,15 @@ const parseSearchInput = (input: string): { artist: string; title: string } => {
     throw new Error('Please enter both artist and song title separated by a hyphen (e.g. "Tate McRae - The Nights")');
   }
   
-  const artist = input.slice(0, firstHyphenIndex);
-  const title = input.slice(firstHyphenIndex + 1);
+  const artist = normalizeText(input.slice(0, firstHyphenIndex));
+  // Don't normalize the title, just trim it to preserve the full name
+  const title = input.slice(firstHyphenIndex + 1).trim();
   
   if (!artist || !title) {
     throw new Error('Please enter both artist and song title separated by a hyphen (e.g. "Tate McRae - The Nights")');
   }
   
-  return {
-    artist: normalizeText(artist),
-    title: normalizeText(title)
-  };
+  return { artist, title };
 };
 
 export const SearchLyrics = () => {
