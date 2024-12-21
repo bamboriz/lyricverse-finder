@@ -21,8 +21,8 @@ const capitalizeForDisplay = (text: string): string => {
 export const Song = () => {
   const { slug } = useParams<{ slug: string }>();
   
-  // Extract artist and title from the slug
-  const slugWithoutSuffix = slug?.split('-lyrics-and-meaning')[0] || '';
+  // Extract artist and title from the slug and ensure they're lowercase
+  const slugWithoutSuffix = (slug?.split('-lyrics-and-meaning')[0] || '').toLowerCase();
   const firstHyphenIndex = slugWithoutSuffix.indexOf('-');
   const artist = decodeFromSlug(slugWithoutSuffix.substring(0, firstHyphenIndex));
   const title = decodeFromSlug(slugWithoutSuffix.substring(firstHyphenIndex + 1));
