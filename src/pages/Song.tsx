@@ -1,72 +1,40 @@
-import { useParams, useLocation } from "react-router-dom";
+import { useParams, useLocation, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { Helmet } from "react-helmet";
 import { fetchFromDatabase, fetchLyrics, saveToDatabase } from "@/services/songService";
 import { LyricsDisplay } from "@/components/LyricsDisplay";
 import { SearchHeader } from "@/components/SearchHeader";
+import { SongMetadata } from "@/components/SongMetadata";
+import { SongNotFound } from "@/components/SongNotFound";
 import { toast } from "sonner";
 import { getAIInterpretation } from "@/services/interpretationService";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-
-const capitalizeForDisplay = (text: string): string => {
-  return text
-    .split(' ')
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ');
-};
-
-const generateSlug = (artist: string, title: string) => {
-  const normalizedArtist = artist.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-  const normalizedTitle = title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-  return `${normalizedArtist}--${normalizedTitle}-lyrics-and-meaning`;
-};
-
-const parseSlugForDirectAccess = (slug: string): { artist: string; title: string } => {
-  // Remove the "-lyrics-and-meaning" suffix
-  const withoutSuffix = slug.replace(/-lyrics-and-meaning$/, '');
-  
-  // Split by double hyphen to separate artist and title
-  const parts = withoutSuffix.split('--');
-  
-  if (parts.length !== 2) {
-    throw new Error('Invalid URL format');
-  }
-
-  // Convert hyphens back to spaces for both artist and title
-  const artist = parts[0].replace(/-/g, ' ').trim();
-  const title = parts[1].replace(/-/g, ' ').trim();
-
-  if (!artist || !title) {
-    throw new Error('Invalid URL format');
-  }
-
-  return { artist, title };
-};
+import { generateSlug, parseSlugForDirectAccess, capitalizeForDisplay } from "@/utils/urlUtils";
 
 export const Song = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { "*": slug } = useParams(); // Get the slug from URL params
+  const { "*": slug } = useParams();
   const [searchInput, setSearchInput] = useState("");
   const [isSearching, setIsSearching] = useState(false);
   
-  // Try to get artist and title from navigation state first
+  // Try to get artist and title from navigation state first, then from URL
   let artist = '', title = '';
   
-  if (location.state?.artist && location.state?.title) {
-    // If coming from search, use the navigation state
-    artist = location.state.artist;
-    title = location.state.title;
-  } else if (slug) {
-    // If accessing directly via URL, parse the slug
-    try {
+  try {
+    if (location.state?.artist && location.state?.title) {
+      // If coming from search, use the navigation state
+      artist = location.state.artist;
+      title = location.state.title;
+    } else if (slug) {
+      // If accessing directly via URL, parse the slug
       const parsed = parseSlugForDirectAccess(slug);
       artist = parsed.artist;
       title = parsed.title;
-    } catch (error) {
-      console.error('Error parsing slug:', error);
+    } else {
+      throw new Error('No song information provided');
     }
+  } catch (error) {
+    console.error('Error getting song info:', error);
   }
 
   const handleSearch = async (e: React.FormEvent) => {
@@ -157,49 +125,24 @@ export const Song = () => {
 
   if (!song) {
     return (
-      <div className="container mx-auto px-4 py-8">
-        <Helmet>
-          <title>Song Not Found - Lyriko</title>
-          <meta property="og:title" content="Song Not Found - Lyriko" />
-          <meta property="og:description" content="We couldn't find the lyrics you're looking for. Try searching for another song." />
-          <meta property="og:url" content={window.location.href} />
-          <meta property="og:type" content="article" />
-        </Helmet>
-        <SearchHeader 
-          searchInput={searchInput}
-          isLoading={isSearching}
-          onSearchInputChange={setSearchInput}
-          onSearch={handleSearch}
-        />
-        <div className="text-center py-8">
-          <h1 className="text-3xl font-bold mb-4">Song Not Found</h1>
-          <p className="text-gray-600">
-            We couldn't find lyrics for "{capitalizeForDisplay(title)}" by {capitalizeForDisplay(artist)}. Please check the artist and song title, or try searching for a different song.
-          </p>
-        </div>
-      </div>
+      <SongNotFound 
+        artist={artist}
+        title={title}
+        searchInput={searchInput}
+        isSearching={isSearching}
+        onSearchInputChange={setSearchInput}
+        onSearch={handleSearch}
+      />
     );
   }
 
-  const truncatedInterpretation = song?.interpretation 
-    ? song.interpretation.split(' ').slice(0, 30).join(' ') + '...'
-    : 'Explore the meaning and interpretation of this song.';
-
   return (
     <div className="container mx-auto px-4 py-8">
-      <Helmet>
-        <title>{`${capitalizeForDisplay(song?.title || title)} by ${capitalizeForDisplay(song?.artist || artist)} - Lyrics and Meaning`}</title>
-        <meta 
-          property="og:title" 
-          content={`${capitalizeForDisplay(song?.title || title)} by ${capitalizeForDisplay(song?.artist || artist)} - Lyrics and Meaning`} 
-        />
-        <meta 
-          property="og:description" 
-          content={truncatedInterpretation} 
-        />
-        <meta property="og:url" content={window.location.href} />
-        <meta property="og:type" content="article" />
-      </Helmet>
+      <SongMetadata 
+        title={song?.title || title}
+        artist={song?.artist || artist}
+        interpretation={song?.interpretation}
+      />
       
       <SearchHeader 
         searchInput={searchInput}
