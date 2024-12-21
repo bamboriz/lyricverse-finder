@@ -1,4 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 export const getAIInterpretation = async (lyrics: string, songTitle: string, artist: string) => {
   try {
@@ -9,13 +10,9 @@ export const getAIInterpretation = async (lyrics: string, songTitle: string, art
       .eq('name', 'OPENAI_API_KEY')
       .single();
     
-    if (secretError) {
+    if (secretError || !secrets?.value) {
       console.error('Error fetching OpenAI API key:', secretError);
       throw new Error('Could not retrieve OpenAI API key');
-    }
-
-    if (!secrets?.value) {
-      throw new Error('OpenAI API key not configured');
     }
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -49,6 +46,7 @@ export const getAIInterpretation = async (lyrics: string, songTitle: string, art
     return data.choices[0].message.content;
   } catch (error) {
     console.error('Error getting AI interpretation:', error);
+    toast.error("Failed to get AI interpretation. Please try again later.");
     throw new Error("Failed to get AI interpretation. Please try again later.");
   }
 };
