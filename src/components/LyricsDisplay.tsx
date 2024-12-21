@@ -4,6 +4,21 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { ChevronDown } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 
+const formatLyrics = (text: string) => {
+  // Split the lyrics into verses (double newlines indicate verse breaks)
+  const verses = text.split(/\n\s*\n/);
+  
+  // Process each verse
+  const formattedVerses = verses.map(verse => {
+    // Split verse into lines and only trim the start and end of the verse block
+    // This preserves spacing between lines within the verse
+    return verse.trim();
+  });
+  
+  // Join verses back together with double newlines to maintain verse separation
+  return formattedVerses.filter(verse => verse.length > 0).join('\n\n');
+};
+
 interface LyricsDisplayProps {
   lyrics: string;
   interpretation: string | null;
@@ -25,7 +40,7 @@ export const LyricsDisplay = ({
     <Card className="p-6 bg-white/50 backdrop-blur-sm border-accent">
       <h2 className="text-2xl font-bold mb-4 text-primary">Lyrics</h2>
       <div className="font-serif text-lg leading-[1em] whitespace-pre-wrap">
-        {lyrics}
+        {formatLyrics(lyrics)}
       </div>
     </Card>
   );
