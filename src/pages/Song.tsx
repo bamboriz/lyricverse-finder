@@ -6,14 +6,22 @@ import { LyricsDisplay } from "@/components/LyricsDisplay";
 import { toast } from "sonner";
 import { getAIInterpretation } from "@/services/interpretationService";
 
+const decodeFromSlug = (slugPart: string): string => {
+  // Convert hyphens back to spaces and capitalize words
+  return slugPart
+    .split('-')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+};
+
 export const Song = () => {
   const { slug } = useParams<{ slug: string }>();
   
   // Extract artist and title from the slug
   const slugWithoutSuffix = slug?.split('-lyrics-and-meaning')[0] || '';
-  const artist = slugWithoutSuffix.split('-')[0];
-  // Get everything after the first dash until the end
-  const title = slugWithoutSuffix.substring(slugWithoutSuffix.indexOf('-') + 1);
+  const firstHyphenIndex = slugWithoutSuffix.indexOf('-');
+  const artist = decodeFromSlug(slugWithoutSuffix.substring(0, firstHyphenIndex));
+  const title = decodeFromSlug(slugWithoutSuffix.substring(firstHyphenIndex + 1));
   
   const { data: song, isLoading } = useQuery({
     queryKey: ['song', artist, title],
