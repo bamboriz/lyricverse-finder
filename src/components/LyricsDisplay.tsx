@@ -24,7 +24,7 @@ export const LyricsDisplay = ({
   const LyricsContent = () => (
     <Card className="p-6 bg-white/50 backdrop-blur-sm border-accent">
       <h2 className="text-2xl font-bold mb-4 text-primary">Lyrics</h2>
-      <div className="whitespace-pre-wrap font-serif text-lg leading-relaxed">
+      <div className="font-serif text-lg leading-normal">
         {lyrics}
       </div>
     </Card>
