@@ -3,8 +3,11 @@ import { useQuery } from "@tanstack/react-query";
 import { Helmet } from "react-helmet";
 import { fetchFromDatabase, fetchLyrics, saveToDatabase } from "@/services/songService";
 import { LyricsDisplay } from "@/components/LyricsDisplay";
+import { SearchHeader } from "@/components/SearchHeader";
 import { toast } from "sonner";
 import { getAIInterpretation } from "@/services/interpretationService";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const decodeFromSlug = (slugPart: string): string => {
   // Convert hyphens back to spaces and keep lowercase for database queries
@@ -18,14 +21,47 @@ const capitalizeForDisplay = (text: string): string => {
     .join(' ');
 };
 
+const generateSlug = (artist: string, title: string) => {
+  const normalizedArtist = artist.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+  const normalizedTitle = title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+  return `${normalizedArtist}-${normalizedTitle}-lyrics-and-meaning`;
+};
+
 export const Song = () => {
   const { slug } = useParams<{ slug: string }>();
+  const navigate = useNavigate();
+  const [searchInput, setSearchInput] = useState("");
+  const [isSearching, setIsSearching] = useState(false);
   
   // Extract artist and title from the slug and ensure they're lowercase
   const slugWithoutSuffix = (slug?.split('-lyrics-and-meaning')[0] || '').toLowerCase();
   const firstHyphenIndex = slugWithoutSuffix.indexOf('-');
   const artist = decodeFromSlug(slugWithoutSuffix.substring(0, firstHyphenIndex));
   const title = decodeFromSlug(slugWithoutSuffix.substring(firstHyphenIndex + 1));
+
+  const handleSearch = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!searchInput.trim()) {
+      toast.error("Please enter an artist and song title");
+      return;
+    }
+    if (!searchInput.includes('-')) {
+      toast.error('Please use the format "Artist - Song Title" (e.g. "Tate McRae - The Nights")');
+      return;
+    }
+    setIsSearching(true);
+    try {
+      const [newArtist, newTitle] = searchInput.split('-').map(s => s.trim());
+      const newSlug = generateSlug(newArtist, newTitle);
+      navigate(`/songs/${newSlug}`);
+    } catch (error) {
+      if (error instanceof Error) {
+        toast.error(error.message);
+      }
+    } finally {
+      setIsSearching(false);
+    }
+  };
   
   const { data: song, isLoading } = useQuery({
     queryKey: ['song', artist, title],
@@ -90,6 +126,12 @@ export const Song = () => {
   if (!song) {
     return (
       <div className="container mx-auto px-4 py-8">
+        <SearchHeader 
+          searchInput={searchInput}
+          isLoading={isSearching}
+          onSearchInputChange={setSearchInput}
+          onSearch={handleSearch}
+        />
         <div className="text-center py-8">
           <h1 className="text-3xl font-bold mb-4">Song Not Found</h1>
           <p className="text-gray-600">
@@ -106,6 +148,13 @@ export const Song = () => {
         <title>{`${capitalizeForDisplay(song.title)} by ${capitalizeForDisplay(song.artist)} - Lyrics and Meaning`}</title>
         <meta name="description" content={`Read the lyrics and meaning of ${song.title} by ${song.artist}. Understand the song's interpretation and significance.`} />
       </Helmet>
+      
+      <SearchHeader 
+        searchInput={searchInput}
+        isLoading={isSearching}
+        onSearchInputChange={setSearchInput}
+        onSearch={handleSearch}
+      />
       
       <h1 className="text-3xl font-bold mb-4">{capitalizeForDisplay(song.title)}</h1>
       <h2 className="text-xl text-gray-600 mb-8">by {capitalizeForDisplay(song.artist)}</h2>
