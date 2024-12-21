@@ -27,11 +27,18 @@ export const Song = () => {
         setTitle(location.state.title);
       } else if (slug) {
         // If accessing directly via URL, parse the slug
-        const parsed = parseSlugForDirectAccess(slug);
-        setArtist(parsed.artist);
-        setTitle(parsed.title);
+        try {
+          const parsed = parseSlugForDirectAccess(slug);
+          setArtist(parsed.artist);
+          setTitle(parsed.title);
+        } catch (error) {
+          console.error('Error parsing slug:', error);
+          toast.error("Invalid song URL");
+          navigate('/');
+          return;
+        }
       } else {
-        // If no song information is available, redirect to home
+        // Only redirect if we have neither state nor slug
         toast.error("No song information provided");
         navigate('/');
         return;
