@@ -8,7 +8,7 @@ export const getAIInterpretation = async (lyrics: string, title: string, artist:
       .from('secrets')
       .select('value')
       .eq('name', 'OPENAI_API_KEY')
-      .single();
+      .maybeSingle();
 
     if (secretError) {
       console.error('Error fetching OpenAI API key:', secretError);
@@ -17,7 +17,7 @@ export const getAIInterpretation = async (lyrics: string, title: string, artist:
 
     if (!secretData?.value) {
       console.error('No OpenAI API key found');
-      throw new Error('OpenAI API key not configured. Please contact support.');
+      throw new Error('OpenAI API key not configured');
     }
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
