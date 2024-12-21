@@ -15,19 +15,21 @@ const formatLyrics = (text: string) => {
     .join("\n");
 };
 
+// This function is only for URL slugs, not database storage
 const generateSlug = (artist: string, title: string) => {
   const normalizedArtist = artist.toLowerCase().replace(/[^a-z0-9]+/g, '-');
   const normalizedTitle = title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
   return `${normalizedArtist}-${normalizedTitle}-lyrics-and-meaning`;
 };
 
+// This function preserves original spacing for database storage
 const parseSearchInput = (input: string): { artist: string; title: string } => {
   const firstHyphenIndex = input.indexOf('-');
   if (firstHyphenIndex === -1) {
     throw new Error('Please enter both artist and song title separated by a hyphen (e.g. "Tate McRae - The Nights")');
   }
   
-  // Extract and preserve original spacing, just trim the ends
+  // Extract and preserve original spacing for database storage
   const artist = input.slice(0, firstHyphenIndex).trim();
   const title = input.slice(firstHyphenIndex + 1).trim();
   
