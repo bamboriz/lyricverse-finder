@@ -29,25 +29,19 @@ const generateSlug = (artist: string, title: string) => {
   return `${normalizedArtist}-${normalizedTitle}-lyrics-and-meaning`;
 };
 
-// Updated to better handle special characters and accents
+// Updated to better handle artist names with spaces
 const parseSearchInput = (input: string): { artist: string; title: string } => {
-  // First try with spaced hyphen " - ", if not found try with regular hyphen "-"
-  const spacedHyphenIndex = input.indexOf(' - ');
-  const regularHyphenIndex = input.indexOf('-');
+  // Look for the separator " - " with spaces
+  const parts = input.split(' - ');
   
-  const separatorIndex = spacedHyphenIndex !== -1 ? spacedHyphenIndex : regularHyphenIndex;
-  const separatorLength = spacedHyphenIndex !== -1 ? 3 : 1; // " - " is 3 chars, "-" is 1 char
-  
-  if (separatorIndex === -1) {
-    throw new Error('Please enter both artist and song title separated by "-" or " - " (e.g. "Céline Dion - Pour que tu m\'aimes encore")');
+  if (parts.length !== 2) {
+    throw new Error('Please enter both artist and song title separated by " - " (e.g. "Céline Dion - Pour que tu m\'aimes encore")');
   }
   
-  // Extract and preserve case and special characters for API calls
-  const artist = input.slice(0, separatorIndex).trim();
-  const title = input.slice(separatorIndex + separatorLength).trim();
+  const [artist, title] = parts.map(part => part.trim());
   
   if (!artist || !title) {
-    throw new Error('Please enter both artist and song title separated by "-" or " - " (e.g. "Céline Dion - Pour que tu m\'aimes encore")');
+    throw new Error('Please enter both artist and song title separated by " - " (e.g. "Céline Dion - Pour que tu m\'aimes encore")');
   }
   
   return { artist, title };
