@@ -7,9 +7,13 @@ import { toast } from "sonner";
 import { getAIInterpretation } from "@/services/interpretationService";
 
 const decodeFromSlug = (slugPart: string): string => {
-  // Convert hyphens back to spaces and capitalize words
-  return slugPart
-    .split('-')
+  // Convert hyphens back to spaces and keep lowercase for database queries
+  return slugPart.split('-').join(' ').toLowerCase();
+};
+
+const capitalizeForDisplay = (text: string): string => {
+  return text
+    .split(' ')
     .map(word => word.charAt(0).toUpperCase() + word.slice(1))
     .join(' ');
 };
@@ -89,7 +93,7 @@ export const Song = () => {
         <div className="text-center py-8">
           <h1 className="text-3xl font-bold mb-4">Song Not Found</h1>
           <p className="text-gray-600">
-            We couldn't find lyrics for "{title}" by {artist}. Please check the artist and song title, or try searching for a different song.
+            We couldn't find lyrics for "{capitalizeForDisplay(title)}" by {capitalizeForDisplay(artist)}. Please check the artist and song title, or try searching for a different song.
           </p>
         </div>
       </div>
@@ -99,12 +103,12 @@ export const Song = () => {
   return (
     <div className="container mx-auto px-4 py-8">
       <Helmet>
-        <title>{`${song.title} by ${song.artist} - Lyrics and Meaning`}</title>
+        <title>{`${capitalizeForDisplay(song.title)} by ${capitalizeForDisplay(song.artist)} - Lyrics and Meaning`}</title>
         <meta name="description" content={`Read the lyrics and meaning of ${song.title} by ${song.artist}. Understand the song's interpretation and significance.`} />
       </Helmet>
       
-      <h1 className="text-3xl font-bold mb-4">{song.title}</h1>
-      <h2 className="text-xl text-gray-600 mb-8">by {song.artist}</h2>
+      <h1 className="text-3xl font-bold mb-4">{capitalizeForDisplay(song.title)}</h1>
+      <h2 className="text-xl text-gray-600 mb-8">by {capitalizeForDisplay(song.artist)}</h2>
       
       {song.lyrics && (
         <LyricsDisplay 
