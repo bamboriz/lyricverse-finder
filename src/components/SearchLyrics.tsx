@@ -31,8 +31,8 @@ const parseSearchInput = (input: string): { artist: string; title: string } => {
     throw new Error('Please enter both artist and song title separated by a hyphen (e.g. "Tate McRae - The Nights")');
   }
   
-  const artist = normalizeText(input.slice(0, firstHyphenIndex));
-  // Don't normalize the title, just trim it to preserve the full name
+  // Just trim the values, don't normalize them for database storage
+  const artist = input.slice(0, firstHyphenIndex).trim();
   const title = input.slice(firstHyphenIndex + 1).trim();
   
   if (!artist || !title) {
