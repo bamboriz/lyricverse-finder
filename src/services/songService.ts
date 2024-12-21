@@ -64,7 +64,7 @@ export const fetchLyrics = async ({ title, artist }: { title: string; artist: st
     const response = await Promise.race([
       fetchPromise,
       timeoutPromise(10000) // 10 second timeout
-    ]);
+    ]) as Response;
     
     if (!response.ok) {
       if (response.status === 404) {
