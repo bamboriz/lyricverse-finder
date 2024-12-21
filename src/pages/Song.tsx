@@ -7,7 +7,7 @@ import { SongMetadata } from "@/components/SongMetadata";
 import { SongNotFound } from "@/components/SongNotFound";
 import { toast } from "sonner";
 import { getAIInterpretation } from "@/services/interpretationService";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { generateSlug, parseSlugForDirectAccess, capitalizeForDisplay } from "@/utils/urlUtils";
 
 export const Song = () => {
@@ -20,22 +20,30 @@ export const Song = () => {
   // Try to get artist and title from navigation state first, then from URL
   let artist = '', title = '';
   
-  try {
-    if (location.state?.artist && location.state?.title) {
-      // If coming from search, use the navigation state
-      artist = location.state.artist;
-      title = location.state.title;
-    } else if (slug) {
-      // If accessing directly via URL, parse the slug
-      const parsed = parseSlugForDirectAccess(slug);
-      artist = parsed.artist;
-      title = parsed.title;
-    } else {
-      throw new Error('No song information provided');
+  useEffect(() => {
+    try {
+      if (location.state?.artist && location.state?.title) {
+        // If coming from search, use the navigation state
+        artist = location.state.artist;
+        title = location.state.title;
+      } else if (slug) {
+        // If accessing directly via URL, parse the slug
+        const parsed = parseSlugForDirectAccess(slug);
+        artist = parsed.artist;
+        title = parsed.title;
+      } else {
+        // If no song information is available, redirect to home
+        toast.error("No song information provided");
+        navigate('/');
+        return;
+      }
+    } catch (error) {
+      console.error('Error getting song info:', error);
+      toast.error("Invalid song URL");
+      navigate('/');
+      return;
     }
-  } catch (error) {
-    console.error('Error getting song info:', error);
-  }
+  }, [location.state, slug, navigate]);
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
