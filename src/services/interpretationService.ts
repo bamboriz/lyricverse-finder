@@ -8,12 +8,12 @@ export const getAIInterpretation = async (lyrics: string, songTitle: string, art
     });
     
     if (secretError) throw new Error('Could not retrieve OpenAI API key');
-    if (!data?.key) throw new Error('OpenAI API key not configured');
+    if (!data?.[0]?.key) throw new Error('OpenAI API key not configured');
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${data.key}`,
+        'Authorization': `Bearer ${data[0].key}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
