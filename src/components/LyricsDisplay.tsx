@@ -84,7 +84,10 @@ export const LyricsDisplay = ({
         </Card>
       </div>
 
-      <LyricCards lyrics={lyrics} songTitle={songTitle} artist={artist} />
+      {/* Added more vertical spacing here with mt-12 */}
+      <div className="mt-12">
+        <LyricCards lyrics={lyrics} songTitle={songTitle} artist={artist} />
+      </div>
     </div>
   );
 };
