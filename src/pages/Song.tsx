@@ -1,7 +1,7 @@
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { Helmet } from "react-helmet";
-import { fetchFromDatabase } from "@/services/songService";
+import { fetchFromDatabase, fetchLyrics, saveToDatabase } from "@/services/songService";
 import { LyricsDisplay } from "@/components/LyricsDisplay";
 
 export const Song = () => {
@@ -15,7 +15,26 @@ export const Song = () => {
     queryKey: ['song', artist, title],
     queryFn: async () => {
       if (!artist || !title) throw new Error('Invalid song URL');
-      return fetchFromDatabase(artist, title);
+      
+      // First try to get from database
+      const dbSong = await fetchFromDatabase(artist, title);
+      if (dbSong) {
+        return dbSong;
+      }
+
+      // If not in database, fetch from API
+      const apiResult = await fetchLyrics({ artist, title });
+      
+      // Save to database for future requests
+      if (apiResult.lyrics) {
+        await saveToDatabase(artist, title, apiResult.lyrics, apiResult.interpretation);
+      }
+      
+      return {
+        artist,
+        title,
+        ...apiResult
+      };
     },
     enabled: !!artist && !!title,
   });
@@ -59,6 +78,8 @@ export const Song = () => {
           lyrics={song.lyrics} 
           interpretation={song.interpretation} 
           isLoadingInterpretation={false}
+          songTitle={song.title}
+          artist={song.artist}
         />
       )}
     </div>

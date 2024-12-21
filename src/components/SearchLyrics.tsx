@@ -4,8 +4,7 @@ import { SearchHeader } from "./SearchHeader";
 import { LyricsDisplay } from "./LyricsDisplay";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { fetchLyrics } from "@/services/songService";
-import { getAIInterpretation } from "@/services/interpretationService";
+import { fetchLyrics, saveToDatabase } from "@/services/songService";
 import { useNavigate } from "react-router-dom";
 
 const formatLyrics = (lyrics: string) => {
@@ -39,14 +38,15 @@ export const SearchLyrics = () => {
         [artist, title] = searchInput.split("-").map((s) => normalizeText(s));
       } else {
         // If no hyphen, assume the entire input is both artist and title
-        // This might need to be adjusted based on your requirements
         artist = normalizeText(searchInput);
         title = normalizeText(searchInput);
       }
       
       const result = await fetchLyrics({ artist, title });
       
+      // Save to database for future requests
       if (result.lyrics) {
+        await saveToDatabase(artist, title, result.lyrics, result.interpretation);
         const slug = generateSlug(artist, title);
         navigate(`/songs/${slug}`);
       }
