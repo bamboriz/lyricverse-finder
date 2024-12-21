@@ -10,7 +10,10 @@ export const Song = () => {
   const { slug } = useParams<{ slug: string }>();
   
   // Extract artist and title from the slug
-  const [artist, title] = slug?.split('-lyrics-and-meaning')[0].split('-') || [];
+  const slugWithoutSuffix = slug?.split('-lyrics-and-meaning')[0] || '';
+  const artist = slugWithoutSuffix.split('-')[0];
+  // Get everything after the first dash until the end
+  const title = slugWithoutSuffix.substring(slugWithoutSuffix.indexOf('-') + 1);
   
   const { data: song, isLoading } = useQuery({
     queryKey: ['song', artist, title],
