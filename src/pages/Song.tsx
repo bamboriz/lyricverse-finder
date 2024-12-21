@@ -27,17 +27,39 @@ const generateSlug = (artist: string, title: string) => {
   return `${normalizedArtist}-${normalizedTitle}-lyrics-and-meaning`;
 };
 
+const parseSlug = (slug: string): { artist: string; title: string } => {
+  // Remove the suffix first
+  const slugWithoutSuffix = slug.split('-lyrics-and-meaning')[0];
+  if (!slugWithoutSuffix) {
+    throw new Error('Invalid URL format');
+  }
+
+  // Find the last occurrence of the artist-title separator
+  // We assume the last part after the last hyphen is the title
+  const parts = slugWithoutSuffix.split('-');
+  if (parts.length < 2) {
+    throw new Error('Invalid URL format');
+  }
+
+  // The title is the last part
+  const titlePart = parts.pop() || '';
+  // The artist is everything else
+  const artistPart = parts.join('-');
+
+  return {
+    artist: decodeFromSlug(artistPart),
+    title: decodeFromSlug(titlePart)
+  };
+};
+
 export const Song = () => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const [searchInput, setSearchInput] = useState("");
   const [isSearching, setIsSearching] = useState(false);
   
-  // Extract artist and title from the slug and ensure they're lowercase
-  const slugWithoutSuffix = (slug?.split('-lyrics-and-meaning')[0] || '').toLowerCase();
-  const firstHyphenIndex = slugWithoutSuffix.indexOf('-');
-  const artist = decodeFromSlug(slugWithoutSuffix.substring(0, firstHyphenIndex));
-  const title = decodeFromSlug(slugWithoutSuffix.substring(firstHyphenIndex + 1));
+  // Extract artist and title from the slug using the new parser
+  const { artist, title } = slug ? parseSlug(slug) : { artist: '', title: '' };
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
