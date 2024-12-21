@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useParams, useLocation } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { Helmet } from "react-helmet";
 import { fetchFromDatabase, fetchLyrics, saveToDatabase } from "@/services/songService";
@@ -8,11 +8,6 @@ import { toast } from "sonner";
 import { getAIInterpretation } from "@/services/interpretationService";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-
-const decodeFromSlug = (slugPart: string): string => {
-  // Convert hyphens back to spaces and keep lowercase for database queries
-  return slugPart.split('-').join(' ').toLowerCase();
-};
 
 const capitalizeForDisplay = (text: string): string => {
   return text
@@ -27,39 +22,14 @@ const generateSlug = (artist: string, title: string) => {
   return `${normalizedArtist}-${normalizedTitle}-lyrics-and-meaning`;
 };
 
-const parseSlug = (slug: string): { artist: string; title: string } => {
-  // Remove the suffix first
-  const slugWithoutSuffix = slug.split('-lyrics-and-meaning')[0];
-  if (!slugWithoutSuffix) {
-    throw new Error('Invalid URL format');
-  }
-
-  // Find the last occurrence of the artist-title separator
-  // We assume the last part after the last hyphen is the title
-  const parts = slugWithoutSuffix.split('-');
-  if (parts.length < 2) {
-    throw new Error('Invalid URL format');
-  }
-
-  // The title is the last part
-  const titlePart = parts.pop() || '';
-  // The artist is everything else
-  const artistPart = parts.join('-');
-
-  return {
-    artist: decodeFromSlug(artistPart),
-    title: decodeFromSlug(titlePart)
-  };
-};
-
 export const Song = () => {
-  const { slug } = useParams<{ slug: string }>();
+  const location = useLocation();
   const navigate = useNavigate();
   const [searchInput, setSearchInput] = useState("");
   const [isSearching, setIsSearching] = useState(false);
   
-  // Extract artist and title from the slug using the new parser
-  const { artist, title } = slug ? parseSlug(slug) : { artist: '', title: '' };
+  // Get artist and title from navigation state
+  const { artist = '', title = '' } = location.state || {};
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -75,7 +45,9 @@ export const Song = () => {
     try {
       const [newArtist, newTitle] = searchInput.split('-').map(s => s.trim());
       const newSlug = generateSlug(newArtist, newTitle);
-      navigate(`/songs/${newSlug}`);
+      navigate(`/songs/${newSlug}`, {
+        state: { artist: newArtist.toLowerCase(), title: newTitle.toLowerCase() }
+      });
     } catch (error) {
       if (error instanceof Error) {
         toast.error(error.message);
@@ -171,17 +143,17 @@ export const Song = () => {
     );
   }
 
-  const truncatedInterpretation = song.interpretation 
+  const truncatedInterpretation = song?.interpretation 
     ? song.interpretation.split(' ').slice(0, 30).join(' ') + '...'
     : 'Explore the meaning and interpretation of this song.';
 
   return (
     <div className="container mx-auto px-4 py-8">
       <Helmet>
-        <title>{`${capitalizeForDisplay(song.title)} by ${capitalizeForDisplay(song.artist)} - Lyrics and Meaning`}</title>
+        <title>{`${capitalizeForDisplay(song?.title || title)} by ${capitalizeForDisplay(song?.artist || artist)} - Lyrics and Meaning`}</title>
         <meta 
           property="og:title" 
-          content={`${capitalizeForDisplay(song.title)} by ${capitalizeForDisplay(song.artist)} - Lyrics and Meaning`} 
+          content={`${capitalizeForDisplay(song?.title || title)} by ${capitalizeForDisplay(song?.artist || artist)} - Lyrics and Meaning`} 
         />
         <meta 
           property="og:description" 
@@ -198,10 +170,10 @@ export const Song = () => {
         onSearch={handleSearch}
       />
       
-      <h1 className="text-3xl font-bold mb-4">{capitalizeForDisplay(song.title)}</h1>
-      <h2 className="text-xl text-gray-600 mb-8">by {capitalizeForDisplay(song.artist)}</h2>
+      <h1 className="text-3xl font-bold mb-4">{capitalizeForDisplay(song?.title || title)}</h1>
+      <h2 className="text-xl text-gray-600 mb-8">by {capitalizeForDisplay(song?.artist || artist)}</h2>
       
-      {song.lyrics && (
+      {song?.lyrics && (
         <LyricsDisplay 
           lyrics={song.lyrics} 
           interpretation={song.interpretation} 

@@ -7,29 +7,6 @@ import { useQuery } from "@tanstack/react-query";
 import { fetchLyrics } from "@/services/songService";
 import { useNavigate } from "react-router-dom";
 
-const formatLyrics = (text: string) => {
-  // Split the lyrics into verses (double newlines indicate verse breaks)
-  const verses = text.split(/\n\s*\n/);
-  
-  // Process each verse
-  const formattedVerses = verses.map(verse => {
-    // Split verse into lines and only trim the start and end of the verse block
-    // This preserves spacing between lines within the verse
-    return verse.trim();
-  });
-  
-  // Join verses back together with double newlines to maintain verse separation
-  return formattedVerses.filter(verse => verse.length > 0).join('\n\n');
-};
-
-// This function is only for URL slugs, not database storage
-const generateSlug = (artist: string, title: string) => {
-  const normalizedArtist = artist.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-  const normalizedTitle = title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-  return `${normalizedArtist}-${normalizedTitle}-lyrics-and-meaning`;
-};
-
-// This function preserves original spacing for database storage
 const parseSearchInput = (input: string): { artist: string; title: string } => {
   const firstHyphenIndex = input.indexOf('-');
   if (firstHyphenIndex === -1) {
@@ -47,6 +24,13 @@ const parseSearchInput = (input: string): { artist: string; title: string } => {
   return { artist, title };
 };
 
+// This function is only for URL slugs, not database storage
+const generateSlug = (artist: string, title: string) => {
+  const normalizedArtist = artist.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+  const normalizedTitle = title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+  return `${normalizedArtist}-${normalizedTitle}-lyrics-and-meaning`;
+};
+
 export const SearchLyrics = () => {
   const navigate = useNavigate();
   const [searchInput, setSearchInput] = useState("");
@@ -58,7 +42,9 @@ export const SearchLyrics = () => {
       try {
         const { artist, title } = parseSearchInput(searchInput);
         const slug = generateSlug(artist, title);
-        navigate(`/songs/${slug}`);
+        navigate(`/songs/${slug}`, {
+          state: { artist, title }
+        });
         return { artist, title };
       } catch (error) {
         if (error instanceof Error) {
