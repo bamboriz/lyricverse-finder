@@ -24,12 +24,8 @@ export const LyricsDisplay = ({
   const LyricsContent = () => (
     <Card className="p-6 bg-white/50 backdrop-blur-sm border-accent">
       <h2 className="text-2xl font-bold mb-4 text-primary">Lyrics</h2>
-      <div className="font-serif text-lg leading-none [&>br]:hidden">
-        {lyrics.split('\n').map((line, index) => (
-          <div key={index} className="min-h-[1.5rem]">
-            {line || '\u00A0'}
-          </div>
-        ))}
+      <div className="font-serif text-lg whitespace-pre-line">
+        {lyrics}
       </div>
     </Card>
   );
