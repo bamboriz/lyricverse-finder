@@ -4,7 +4,7 @@ import { SearchHeader } from "./SearchHeader";
 import { LyricsDisplay } from "./LyricsDisplay";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { fetchLyrics, saveToDatabase, fetchFromDatabase } from "@/services/songService";
+import { fetchLyrics } from "@/services/songService";
 import { useNavigate } from "react-router-dom";
 
 const formatLyrics = (text: string) => {
@@ -13,10 +13,6 @@ const formatLyrics = (text: string) => {
     .map(line => line.trim())
     .filter(line => line.length > 0)
     .join("\n");
-};
-
-const normalizeText = (text: string) => {
-  return text.toLowerCase().trim();
 };
 
 const generateSlug = (artist: string, title: string) => {
@@ -52,34 +48,9 @@ export const SearchLyrics = () => {
     queryFn: async () => {
       try {
         const { artist, title } = parseSearchInput(searchInput);
-        
-        // First try to get from database
-        const dbResult = await fetchFromDatabase(artist, title);
-        if (dbResult) {
-          const slug = generateSlug(artist, title);
-          navigate(`/songs/${slug}`);
-          return dbResult;
-        }
-        
-        // If not in database, fetch from API
-        const result = await fetchLyrics({ artist, title });
-        
-        if (result.lyrics) {
-          try {
-            await saveToDatabase(artist, title, result.lyrics, result.interpretation);
-            const slug = generateSlug(artist, title);
-            navigate(`/songs/${slug}`);
-          } catch (error: any) {
-            // If we get a duplicate error, it means the song was saved by another request
-            // We can safely ignore this and continue
-            if (error.code !== '23505') {
-              console.error('Error saving to database:', error);
-              throw error;
-            }
-          }
-        }
-        
-        return result;
+        const slug = generateSlug(artist, title);
+        navigate(`/songs/${slug}`);
+        return { artist, title };
       } catch (error) {
         if (error instanceof Error) {
           toast.error(error.message);
