@@ -6,13 +6,14 @@ export const fetchFromDatabase = async (artist: string, title: string) => {
     .select('*')
     .eq('artist', artist)
     .eq('title', title)
-    .single();
+    .maybeSingle();
 
   if (error) {
-    if (error.code !== 'PGRST116') { // PGRST116 is "no rows returned"
-      console.error('Supabase error:', error);
+    if (error.code === 'PGRST116') { // No rows returned
+      return null;
     }
-    return null;
+    console.error('Supabase error:', error);
+    throw error;
   }
 
   // Increment hits for the song
