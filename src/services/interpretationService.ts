@@ -2,7 +2,7 @@ import { supabase } from "@/integrations/supabase/client";
 
 export const getAIInterpretation = async (lyrics: string, songTitle: string, artist: string) => {
   try {
-    // Get the OpenAI API key from Supabase
+    // Get the OpenAI API key from Supabase secrets table
     const { data: secrets, error: secretError } = await supabase
       .from('secrets')
       .select('value')
