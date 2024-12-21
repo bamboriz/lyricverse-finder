@@ -16,21 +16,20 @@ export const Song = () => {
   const { "*": slug } = useParams();
   const [searchInput, setSearchInput] = useState("");
   const [isSearching, setIsSearching] = useState(false);
-  
-  // Try to get artist and title from navigation state first, then from URL
-  let artist = '', title = '';
+  const [artist, setArtist] = useState("");
+  const [title, setTitle] = useState("");
   
   useEffect(() => {
     try {
       if (location.state?.artist && location.state?.title) {
         // If coming from search, use the navigation state
-        artist = location.state.artist;
-        title = location.state.title;
+        setArtist(location.state.artist);
+        setTitle(location.state.title);
       } else if (slug) {
         // If accessing directly via URL, parse the slug
         const parsed = parseSlugForDirectAccess(slug);
-        artist = parsed.artist;
-        title = parsed.title;
+        setArtist(parsed.artist);
+        setTitle(parsed.title);
       } else {
         // If no song information is available, redirect to home
         toast.error("No song information provided");
