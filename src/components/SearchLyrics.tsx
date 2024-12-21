@@ -13,14 +13,9 @@ const formatLyrics = (text: string) => {
   
   // Process each verse
   const formattedVerses = verses.map(verse => {
-    // Split verse into lines, trim each line, and filter out empty lines
-    const lines = verse
-      .split('\n')
-      .map(line => line.trim())
-      .filter(line => line.length > 0);
-    
-    // Join the lines back together with single newlines
-    return lines.join('\n');
+    // Split verse into lines and only trim the start and end of the verse block
+    // This preserves spacing between lines within the verse
+    return verse.trim();
   });
   
   // Join verses back together with double newlines to maintain verse separation
