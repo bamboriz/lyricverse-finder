@@ -46,8 +46,8 @@ export const LyricsDisplay = ({
   );
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto px-4">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div className="space-y-4 max-w-7xl mx-auto px-2">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {isMobile ? (
           <Collapsible>
             <CollapsibleTrigger className="w-full">
