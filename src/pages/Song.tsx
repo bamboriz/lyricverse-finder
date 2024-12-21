@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Helmet } from "react-helmet";
 import { fetchFromDatabase, fetchLyrics, saveToDatabase } from "@/services/songService";
 import { LyricsDisplay } from "@/components/LyricsDisplay";
+import { toast } from "sonner";
 
 export const Song = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -16,25 +17,32 @@ export const Song = () => {
     queryFn: async () => {
       if (!artist || !title) throw new Error('Invalid song URL');
       
-      // First try to get from database
-      const dbSong = await fetchFromDatabase(artist, title);
-      if (dbSong) {
-        return dbSong;
-      }
+      try {
+        // First try to get from database
+        const dbSong = await fetchFromDatabase(artist, title);
+        if (dbSong) {
+          return dbSong;
+        }
 
-      // If not in database, fetch from API
-      const apiResult = await fetchLyrics({ artist, title });
-      
-      // Save to database for future requests
-      if (apiResult.lyrics) {
-        await saveToDatabase(artist, title, apiResult.lyrics, apiResult.interpretation);
+        // If not in database, fetch from API
+        const apiResult = await fetchLyrics({ artist, title });
+        
+        // Save to database for future requests
+        if (apiResult.lyrics) {
+          await saveToDatabase(artist, title, apiResult.lyrics, apiResult.interpretation);
+          return {
+            artist,
+            title,
+            ...apiResult
+          };
+        }
+        
+        throw new Error(`No lyrics found for "${title}" by ${artist}`);
+      } catch (error) {
+        console.error('Error fetching song:', error);
+        toast.error(error instanceof Error ? error.message : 'Failed to load song');
+        throw error;
       }
-      
-      return {
-        artist,
-        title,
-        ...apiResult
-      };
     },
     enabled: !!artist && !!title,
   });
@@ -47,18 +55,15 @@ export const Song = () => {
     );
   }
 
-  if (error) {
+  if (error || !song) {
     return (
-      <div className="text-center py-8 text-red-500">
-        {error instanceof Error ? error.message : "Failed to load song"}
-      </div>
-    );
-  }
-
-  if (!song) {
-    return (
-      <div className="text-center py-8 text-red-500">
-        Song not found
+      <div className="container mx-auto px-4 py-8">
+        <div className="text-center py-8">
+          <h1 className="text-3xl font-bold mb-4">Song Not Found</h1>
+          <p className="text-gray-600">
+            We couldn't find lyrics for "{title}" by {artist}. Please check the artist and song title, or try searching for a different song.
+          </p>
+        </div>
       </div>
     );
   }
