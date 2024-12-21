@@ -6,6 +6,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { fetchLyrics } from "@/services/songService";
 import { getAIInterpretation } from "@/services/interpretationService";
+import { useNavigate } from "react-router-dom";
 
 const formatLyrics = (lyrics: string) => {
   return lyrics
@@ -19,7 +20,12 @@ const normalizeText = (text: string) => {
   return text.toLowerCase().trim();
 };
 
+const generateSlug = (artist: string, title: string) => {
+  return `${artist.toLowerCase().replace(/\s+/g, "-")}-${title.toLowerCase().replace(/\s+/g, "-")}-lyrics-and-meaning`;
+};
+
 export const SearchLyrics = () => {
+  const navigate = useNavigate();
   const [searchInput, setSearchInput] = useState("");
   const [isSearching, setIsSearching] = useState(false);
   const [interpretation, setInterpretation] = useState<string | null>(null);
@@ -39,18 +45,10 @@ export const SearchLyrics = () => {
       setCurrentSong({ title, artist });
       const result = await fetchLyrics({ artist, title });
       
-      if (result.interpretation) {
-        setInterpretation(result.interpretation);
-      } else if (result.lyrics) {
-        try {
-          setIsLoadingInterpretation(true);
-          const interpretationResult = await getAIInterpretation(result.lyrics, title, artist);
-          setInterpretation(interpretationResult);
-        } catch (error) {
-          toast.error(error instanceof Error ? error.message : "Failed to get interpretation");
-        } finally {
-          setIsLoadingInterpretation(false);
-        }
+      if (result.lyrics) {
+        // Navigate to the song page
+        const slug = generateSlug(artist, title);
+        navigate(`/songs/${slug}`);
       }
       
       return result;
@@ -91,18 +89,6 @@ export const SearchLyrics = () => {
       {error && (
         <div className="text-center py-8 text-red-500">
           {error instanceof Error ? error.message : "An error occurred while fetching the lyrics."}
-        </div>
-      )}
-
-      {data && isSearching && (
-        <div className="animate-fade-up">
-          <LyricsDisplay 
-            lyrics={formatLyrics(data.lyrics)} 
-            interpretation={interpretation}
-            isLoadingInterpretation={isLoadingInterpretation}
-            songTitle={currentSong.title}
-            artist={currentSong.artist}
-          />
         </div>
       )}
     </>
