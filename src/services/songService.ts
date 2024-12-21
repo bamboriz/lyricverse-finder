@@ -48,8 +48,10 @@ export const fetchLyrics = async ({ title, artist }: { title: string; artist: st
   }
 
   // If not in database, fetch from API
+  // Replace spaces with underscores in artist name to handle multi-word artist names
+  const formattedArtist = artist.replace(/\s+/g, '_');
   const response = await fetch(
-    `https://api.lyrics.ovh/v1/${encodeURIComponent(artist)}/${encodeURIComponent(title)}`
+    `https://api.lyrics.ovh/v1/${encodeURIComponent(formattedArtist)}/${encodeURIComponent(title)}`
   );
   
   if (response.status === 404) {
