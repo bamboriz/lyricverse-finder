@@ -26,8 +26,13 @@ const generateSlug = (artist: string, title: string) => {
 };
 
 const parseSearchInput = (input: string): { artist: string; title: string } => {
-  const [artist, ...titleParts] = input.split('-').map(part => part.trim());
-  const title = titleParts.join('-'); // Rejoin title parts in case title contains hyphens
+  const firstHyphenIndex = input.indexOf('-');
+  if (firstHyphenIndex === -1) {
+    throw new Error('Please enter both artist and song title separated by a hyphen (e.g. "Tate McRae - The Nights")');
+  }
+  
+  const artist = input.slice(0, firstHyphenIndex);
+  const title = input.slice(firstHyphenIndex + 1);
   
   if (!artist || !title) {
     throw new Error('Please enter both artist and song title separated by a hyphen (e.g. "Tate McRae - The Nights")');
