@@ -29,19 +29,20 @@ const generateSlug = (artist: string, title: string) => {
   return `${normalizedArtist}-${normalizedTitle}-lyrics-and-meaning`;
 };
 
-// This function preserves original spacing for database storage
+// Updated to better handle special characters and accents
 const parseSearchInput = (input: string): { artist: string; title: string } => {
-  const firstHyphenIndex = input.indexOf('-');
-  if (firstHyphenIndex === -1) {
-    throw new Error('Please enter both artist and song title separated by a hyphen (e.g. "Tate McRae - The Nights")');
+  // Find the last occurrence of " - " to handle cases where the artist name might contain hyphens
+  const lastHyphenIndex = input.lastIndexOf(' - ');
+  if (lastHyphenIndex === -1) {
+    throw new Error('Please enter both artist and song title separated by " - " (e.g. "Céline Dion - Pour que tu m\'aimes encore")');
   }
   
-  // Extract and convert to lowercase for database storage
-  const artist = input.slice(0, firstHyphenIndex).trim().toLowerCase();
-  const title = input.slice(firstHyphenIndex + 1).trim().toLowerCase();
+  // Extract and preserve case and special characters for API calls
+  const artist = input.slice(0, lastHyphenIndex).trim();
+  const title = input.slice(lastHyphenIndex + 3).trim(); // +3 to skip " - "
   
   if (!artist || !title) {
-    throw new Error('Please enter both artist and song title separated by a hyphen (e.g. "Tate McRae - The Nights")');
+    throw new Error('Please enter both artist and song title separated by " - " (e.g. "Céline Dion - Pour que tu m\'aimes encore")');
   }
   
   return { artist, title };
