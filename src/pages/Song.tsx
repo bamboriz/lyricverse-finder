@@ -126,6 +126,13 @@ export const Song = () => {
   if (!song) {
     return (
       <div className="container mx-auto px-4 py-8">
+        <Helmet>
+          <title>Song Not Found - Lyriko</title>
+          <meta property="og:title" content="Song Not Found - Lyriko" />
+          <meta property="og:description" content="We couldn't find the lyrics you're looking for. Try searching for another song." />
+          <meta property="og:url" content={window.location.href} />
+          <meta property="og:type" content="article" />
+        </Helmet>
         <SearchHeader 
           searchInput={searchInput}
           isLoading={isSearching}
@@ -142,11 +149,24 @@ export const Song = () => {
     );
   }
 
+  const truncatedInterpretation = song.interpretation 
+    ? song.interpretation.split(' ').slice(0, 30).join(' ') + '...'
+    : 'Explore the meaning and interpretation of this song.';
+
   return (
     <div className="container mx-auto px-4 py-8">
       <Helmet>
         <title>{`${capitalizeForDisplay(song.title)} by ${capitalizeForDisplay(song.artist)} - Lyrics and Meaning`}</title>
-        <meta name="description" content={`Read the lyrics and meaning of ${song.title} by ${song.artist}. Understand the song's interpretation and significance.`} />
+        <meta 
+          property="og:title" 
+          content={`${capitalizeForDisplay(song.title)} by ${capitalizeForDisplay(song.artist)} - Lyrics and Meaning`} 
+        />
+        <meta 
+          property="og:description" 
+          content={truncatedInterpretation} 
+        />
+        <meta property="og:url" content={window.location.href} />
+        <meta property="og:type" content="article" />
       </Helmet>
       
       <SearchHeader 
