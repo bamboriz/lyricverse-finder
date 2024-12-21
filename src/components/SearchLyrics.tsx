@@ -25,6 +25,20 @@ const generateSlug = (artist: string, title: string) => {
   return `${normalizedArtist}-${normalizedTitle}-lyrics-and-meaning`;
 };
 
+const parseSearchInput = (input: string): { artist: string; title: string } => {
+  const [artist, ...titleParts] = input.split('-').map(part => part.trim());
+  const title = titleParts.join('-'); // Rejoin title parts in case title contains hyphens
+  
+  if (!artist || !title) {
+    throw new Error('Please enter both artist and song title separated by a hyphen (e.g. "Tate McRae - The Nights")');
+  }
+  
+  return {
+    artist: normalizeText(artist),
+    title: normalizeText(title)
+  };
+};
+
 export const SearchLyrics = () => {
   const navigate = useNavigate();
   const [searchInput, setSearchInput] = useState("");
@@ -33,42 +47,42 @@ export const SearchLyrics = () => {
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ["lyrics", searchInput],
     queryFn: async () => {
-      let artist = "", title = "";
-      if (searchInput.includes("-")) {
-        [artist, title] = searchInput.split("-").map((s) => normalizeText(s));
-      } else {
-        // If no hyphen, assume the entire input is both artist and title
-        artist = normalizeText(searchInput);
-        title = normalizeText(searchInput);
-      }
-      
-      // First try to get from database
-      const dbResult = await fetchFromDatabase(artist, title);
-      if (dbResult) {
-        const slug = generateSlug(artist, title);
-        navigate(`/songs/${slug}`);
-        return dbResult;
-      }
-      
-      // If not in database, fetch from API
-      const result = await fetchLyrics({ artist, title });
-      
-      if (result.lyrics) {
-        try {
-          await saveToDatabase(artist, title, result.lyrics, result.interpretation);
+      try {
+        const { artist, title } = parseSearchInput(searchInput);
+        
+        // First try to get from database
+        const dbResult = await fetchFromDatabase(artist, title);
+        if (dbResult) {
           const slug = generateSlug(artist, title);
           navigate(`/songs/${slug}`);
-        } catch (error: any) {
-          // If we get a duplicate error, it means the song was saved by another request
-          // We can safely ignore this and continue
-          if (error.code !== '23505') {
-            console.error('Error saving to database:', error);
-            throw error;
+          return dbResult;
+        }
+        
+        // If not in database, fetch from API
+        const result = await fetchLyrics({ artist, title });
+        
+        if (result.lyrics) {
+          try {
+            await saveToDatabase(artist, title, result.lyrics, result.interpretation);
+            const slug = generateSlug(artist, title);
+            navigate(`/songs/${slug}`);
+          } catch (error: any) {
+            // If we get a duplicate error, it means the song was saved by another request
+            // We can safely ignore this and continue
+            if (error.code !== '23505') {
+              console.error('Error saving to database:', error);
+              throw error;
+            }
           }
         }
+        
+        return result;
+      } catch (error) {
+        if (error instanceof Error) {
+          toast.error(error.message);
+        }
+        throw error;
       }
-      
-      return result;
     },
     enabled: false,
   });
@@ -76,7 +90,11 @@ export const SearchLyrics = () => {
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!searchInput.trim()) {
-      toast.error("Please enter an artist or song title");
+      toast.error("Please enter an artist and song title");
+      return;
+    }
+    if (!searchInput.includes('-')) {
+      toast.error('Please use the format "Artist - Song Title" (e.g. "Tate McRae - The Nights")');
       return;
     }
     setIsSearching(true);
