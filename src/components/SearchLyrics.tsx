@@ -4,7 +4,7 @@ import { SearchHeader } from "./SearchHeader";
 import { LyricsDisplay } from "./LyricsDisplay";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { fetchLyrics, saveToDatabase } from "@/services/songService";
+import { fetchLyrics, saveToDatabase, fetchFromDatabase } from "@/services/songService";
 import { useNavigate } from "react-router-dom";
 
 const formatLyrics = (lyrics: string) => {
@@ -42,13 +42,30 @@ export const SearchLyrics = () => {
         title = normalizeText(searchInput);
       }
       
-      const result = await fetchLyrics({ artist, title });
-      
-      // Save to database for future requests
-      if (result.lyrics) {
-        await saveToDatabase(artist, title, result.lyrics, result.interpretation);
+      // First try to get from database
+      const dbResult = await fetchFromDatabase(artist, title);
+      if (dbResult) {
         const slug = generateSlug(artist, title);
         navigate(`/songs/${slug}`);
+        return dbResult;
+      }
+      
+      // If not in database, fetch from API
+      const result = await fetchLyrics({ artist, title });
+      
+      if (result.lyrics) {
+        try {
+          await saveToDatabase(artist, title, result.lyrics, result.interpretation);
+          const slug = generateSlug(artist, title);
+          navigate(`/songs/${slug}`);
+        } catch (error: any) {
+          // If we get a duplicate error, it means the song was saved by another request
+          // We can safely ignore this and continue
+          if (error.code !== '23505') {
+            console.error('Error saving to database:', error);
+            throw error;
+          }
+        }
       }
       
       return result;
