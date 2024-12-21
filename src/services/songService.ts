@@ -41,25 +41,33 @@ export const saveToDatabase = async (artist: string, title: string, lyrics: stri
 };
 
 export const fetchLyrics = async ({ title, artist }: { title: string; artist: string }) => {
-  // First, try to get from database
-  const dbSong = await fetchFromDatabase(artist, title);
-  if (dbSong) {
-    return dbSong;
-  }
+  try {
+    // First, try to get from database
+    const dbSong = await fetchFromDatabase(artist, title);
+    if (dbSong) {
+      return dbSong;
+    }
 
-  // If not in database, fetch from API
-  const response = await fetch(
-    `https://api.lyrics.ovh/v1/${encodeURIComponent(artist)}/${encodeURIComponent(title)}`
-  );
-  
-  if (response.status === 404) {
-    throw new Error("No lyrics found for this song. Please check the artist and title, or try a different song.");
-  }
-  
-  if (!response.ok) {
+    // If not in database, fetch from API
+    const response = await fetch(
+      `https://api.lyrics.ovh/v1/${encodeURIComponent(artist)}/${encodeURIComponent(title)}`
+    );
+    
+    if (response.status === 404) {
+      throw new Error(`No lyrics found for "${title}" by ${artist}. Please check the artist and title, or try a different song.`);
+    }
+    
+    if (!response.ok) {
+      throw new Error("An error occurred while fetching the lyrics. Please try again later.");
+    }
+
+    const data = await response.json();
+    return { lyrics: data.lyrics, interpretation: null };
+  } catch (error) {
+    console.error('Error fetching lyrics:', error);
+    if (error instanceof Error) {
+      throw error;
+    }
     throw new Error("An error occurred while fetching the lyrics. Please try again later.");
   }
-
-  const data = await response.json();
-  return { lyrics: data.lyrics, interpretation: null };
 };
