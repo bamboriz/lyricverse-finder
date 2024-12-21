@@ -44,6 +44,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_secret: {
+        Args: {
+          secret_name: string
+        }
+        Returns: {
+          key: string
+        }[]
+      }
       increment_song_hits: {
         Args: {
           song_id: number

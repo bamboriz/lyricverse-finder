@@ -3,14 +3,17 @@ import { supabase } from "@/integrations/supabase/client";
 export const getAIInterpretation = async (lyrics: string, songTitle: string, artist: string) => {
   try {
     // Get the OpenAI API key from Supabase
-    const { data: { key }, error: secretError } = await supabase.rpc('get_secret', { secret_name: 'OPENAI_API_KEY' });
+    const { data, error: secretError } = await supabase.rpc('get_secret', { 
+      secret_name: 'OPENAI_API_KEY' 
+    });
+    
     if (secretError) throw new Error('Could not retrieve OpenAI API key');
-    if (!key) throw new Error('OpenAI API key not configured');
+    if (!data?.key) throw new Error('OpenAI API key not configured');
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${key}`,
+        'Authorization': `Bearer ${data.key}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
@@ -34,8 +37,8 @@ export const getAIInterpretation = async (lyrics: string, songTitle: string, art
       throw new Error(`OpenAI API error: ${errorData.error?.message || 'Unknown error'}`);
     }
 
-    const data = await response.json();
-    const interpretation = data.choices[0].message.content;
+    const data2 = await response.json();
+    const interpretation = data2.choices[0].message.content;
 
     // Save the interpretation to the database
     const { error: dbError } = await supabase
