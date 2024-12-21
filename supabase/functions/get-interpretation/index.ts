@@ -15,11 +15,26 @@ serve(async (req) => {
 
   try {
     const { lyrics, songTitle, artist } = await req.json();
-    const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
 
-    if (!openAIApiKey) {
-      throw new Error('OpenAI API key not configured');
+    // Create Supabase client
+    const supabaseClient = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    );
+
+    // Fetch OpenAI API key from secrets table
+    const { data: secretData, error: secretError } = await supabaseClient
+      .from('secrets')
+      .select('value')
+      .eq('name', 'OPENAI_API_KEY')
+      .single();
+
+    if (secretError || !secretData) {
+      console.error('Error fetching OpenAI API key:', secretError);
+      throw new Error('OpenAI API key not found in secrets');
     }
+
+    const openAIApiKey = secretData.value;
 
     console.log('Making request to OpenAI API...', { songTitle, artist });
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -62,11 +77,6 @@ serve(async (req) => {
     const interpretation = data.choices[0].message.content;
 
     // Save to database using Supabase client
-    const supabaseClient = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-    );
-
     const { error: dbError } = await supabaseClient
       .from('songs')
       .update({ interpretation })
