@@ -27,7 +27,7 @@ const parseSearchInput = (input: string): { artist: string; title: string } => {
     throw new Error('Please enter both artist and song title separated by a hyphen (e.g. "Tate McRae - The Nights")');
   }
   
-  // Just trim the values, don't normalize them for database storage
+  // Extract and preserve original spacing, just trim the ends
   const artist = input.slice(0, firstHyphenIndex).trim();
   const title = input.slice(firstHyphenIndex + 1).trim();
   
