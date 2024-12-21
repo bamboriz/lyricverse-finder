@@ -21,7 +21,7 @@ serve(async (req) => {
       throw new Error('OpenAI API key not configured');
     }
 
-    console.log('Making request to OpenAI API...');
+    console.log('Making request to OpenAI API...', { songTitle, artist });
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -45,6 +45,12 @@ serve(async (req) => {
       }),
     });
 
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error('OpenAI API error:', errorData);
+      throw new Error(`OpenAI API error: ${errorData.error?.message || 'Unknown error'}`);
+    }
+
     const data = await response.json();
     console.log('Received response from OpenAI');
     
@@ -63,21 +69,22 @@ serve(async (req) => {
 
     const { error: dbError } = await supabaseClient
       .from('songs')
-      .upsert({
-        artist,
-        title: songTitle,
-        lyrics,
-        interpretation
-      });
+      .update({ interpretation })
+      .match({ artist, title: songTitle });
 
     if (dbError) {
       console.error('Error saving to database:', dbError);
-      throw dbError;
+      // Don't throw here, we still want to return the interpretation
     }
 
     return new Response(
       JSON.stringify({ interpretation }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      { 
+        headers: { 
+          ...corsHeaders, 
+          'Content-Type': 'application/json' 
+        } 
+      }
     );
   } catch (error) {
     console.error('Error in get-interpretation function:', error);
@@ -85,7 +92,10 @@ serve(async (req) => {
       JSON.stringify({ error: error.message }),
       { 
         status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+        headers: { 
+          ...corsHeaders, 
+          'Content-Type': 'application/json' 
+        }
       }
     );
   }
