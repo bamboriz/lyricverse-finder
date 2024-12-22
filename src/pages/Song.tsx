@@ -1,14 +1,14 @@
 import { useParams, useLocation, useNavigate } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
-import { fetchFromDatabase, fetchLyrics, saveToDatabase } from "@/services/songService";
+import { useState, useEffect } from "react";
 import { LyricsDisplay } from "@/components/LyricsDisplay";
 import { SearchHeader } from "@/components/SearchHeader";
 import { SongMetadata } from "@/components/SongMetadata";
 import { SongNotFound } from "@/components/SongNotFound";
 import { toast } from "sonner";
-import { getAIInterpretation } from "@/services/interpretationService";
-import { useState, useEffect } from "react";
-import { generateSlug, parseSlugForDirectAccess, capitalizeForDisplay } from "@/utils/urlUtils";
+import { generateSlug, parseSlugForDirectAccess } from "@/utils/urlUtils";
+import { useSongData } from "@/hooks/useSongData";
+import { LoadingState } from "@/components/song/LoadingState";
+import { SongHeader } from "@/components/song/SongHeader";
 
 export const Song = () => {
   const location = useLocation();
@@ -21,11 +21,9 @@ export const Song = () => {
   
   useEffect(() => {
     if (location.state?.artist && location.state?.title) {
-      // If coming from search, use the navigation state
       setArtist(location.state.artist);
       setTitle(location.state.title);
     } else if (slug) {
-      // If accessing directly via URL, parse the slug
       try {
         const parsed = parseSlugForDirectAccess(slug);
         setArtist(parsed.artist);
@@ -36,7 +34,6 @@ export const Song = () => {
         navigate('/');
       }
     } else {
-      // Only redirect if we have neither state nor slug
       toast.error("No song information provided");
       navigate('/');
     }
@@ -68,64 +65,10 @@ export const Song = () => {
     }
   };
   
-  const { data: song, isLoading } = useQuery({
-    queryKey: ['song', artist, title],
-    queryFn: async () => {
-      if (!artist || !title) return null;
-      
-      try {
-        // First try to get from database
-        const dbSong = await fetchFromDatabase(artist, title);
-        
-        // If we have both lyrics and interpretation, return it
-        if (dbSong?.lyrics && dbSong?.interpretation) {
-          return dbSong;
-        }
-
-        // If we have lyrics but no interpretation, get interpretation
-        if (dbSong?.lyrics && !dbSong?.interpretation) {
-          const interpretation = await getAIInterpretation(dbSong.lyrics, title, artist);
-          await saveToDatabase(artist, title, dbSong.lyrics, interpretation);
-          return {
-            ...dbSong,
-            interpretation
-          };
-        }
-
-        // If nothing in database, fetch lyrics from API
-        const apiResult = await fetchLyrics({ artist, title });
-        
-        if (!apiResult.lyrics) {
-          throw new Error(`No lyrics found for "${title}" by ${artist}`);
-        }
-
-        // Get interpretation for the lyrics
-        const interpretation = await getAIInterpretation(apiResult.lyrics, title, artist);
-        
-        // Save everything to database
-        await saveToDatabase(artist, title, apiResult.lyrics, interpretation);
-        
-        return {
-          artist,
-          title,
-          lyrics: apiResult.lyrics,
-          interpretation
-        };
-      } catch (error) {
-        console.error('Error fetching song:', error);
-        toast.error(error instanceof Error ? error.message : 'Failed to load song');
-        throw error;
-      }
-    },
-    enabled: !!artist && !!title,
-  });
+  const { data: song, isLoading } = useSongData(artist, title);
 
   if (isLoading) {
-    return (
-      <div className="text-center py-8">
-        <div className="animate-pulse text-primary">Loading song...</div>
-      </div>
-    );
+    return <LoadingState />;
   }
 
   if (!song) {
@@ -156,8 +99,7 @@ export const Song = () => {
         onSearch={handleSearch}
       />
       
-      <h1 className="text-3xl font-bold mb-4">{capitalizeForDisplay(song?.title || title)}</h1>
-      <h2 className="text-xl text-gray-600 mb-8">by {capitalizeForDisplay(song?.artist || artist)}</h2>
+      <SongHeader title={song?.title || title} artist={song?.artist || artist} />
       
       {song?.lyrics && (
         <LyricsDisplay 
