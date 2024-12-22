@@ -1,7 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
 import { generateSlug } from "./urlUtils";
-import fs from 'fs';
-import path from 'path';
 
 const BASE_URL = 'https://lyriko.xyz';
 
@@ -40,8 +38,19 @@ export const generateSitemap = async () => {
   </url>`).join('\n')}
 </urlset>`;
 
-  // Write to the public directory
-  const sitemapPath = path.join(process.cwd(), 'public', 'sitemap.xml');
-  fs.writeFileSync(sitemapPath, xml);
+  // Store the sitemap in the database
+  const { error: upsertError } = await supabase
+    .from('sitemaps')
+    .upsert({ 
+      id: 1, // We'll always use ID 1 since we only need one sitemap
+      content: xml,
+      updated_at: new Date().toISOString()
+    });
+
+  if (upsertError) {
+    console.error('Error saving sitemap:', upsertError);
+    return;
+  }
+
   console.log('Sitemap generated successfully');
 };
