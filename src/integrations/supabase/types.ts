@@ -30,6 +30,24 @@ export type Database = {
         }
         Relationships: []
       }
+      sitemaps: {
+        Row: {
+          content: string
+          id: number
+          updated_at: string
+        }
+        Insert: {
+          content: string
+          id: number
+          updated_at?: string
+        }
+        Update: {
+          content?: string
+          id?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       songs: {
         Row: {
           artist: string
