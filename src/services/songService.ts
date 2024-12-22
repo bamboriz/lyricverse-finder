@@ -1,4 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
+import { generateSitemap } from "@/utils/sitemapGenerator";
 
 export const fetchFromDatabase = async (artist: string, title: string) => {
   const { data, error } = await supabase
@@ -38,6 +39,9 @@ export const saveToDatabase = async (artist: string, title: string, lyrics: stri
     console.error('Error saving to database:', error);
     throw error;
   }
+
+  // Generate new sitemap after saving
+  await generateSitemap();
 };
 
 const timeoutPromise = (ms: number) => {
