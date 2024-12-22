@@ -9,7 +9,6 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 const BASE_URL = 'https://lyriko.xyz';
 
-// Helper function to generate slug (copied from urlUtils.ts)
 const generateSlug = (artist, title) => {
   const normalizedArtist = artist.toLowerCase().replace(/[^a-z0-9]+/g, '-');
   const normalizedTitle = title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
@@ -28,25 +27,15 @@ async function generateLocalSitemap() {
     }
 
     const xml = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>${BASE_URL}/</loc>
-    <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>1.0</priority>
   </url>
   <url>
     <loc>${BASE_URL}/songs/</loc>
-    <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
   </url>
-  ${songs.map(song => `
-  <url>
+  ${songs.map(song => `  <url>
     <loc>${BASE_URL}/songs/${generateSlug(song.artist, song.title)}</loc>
-    <lastmod>${new Date(song.created_at).toISOString().split('T')[0]}</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>`).join('\n')}
 </urlset>`;
 
