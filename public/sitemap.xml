@@ -1,323 +1,141 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>https://lyriko.xyz/</loc>
-    <lastmod>2024-12-22</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>1.0</priority>
   </url>
   <url>
     <loc>https://lyriko.xyz/songs/</loc>
-    <lastmod>2024-12-22</lastmod>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
   </url>
-  
-  <url>
+    <url>
     <loc>https://lyriko.xyz/songs/brandy--true-lyrics-and-meaning</loc>
-    <lastmod>2024-12-21</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
-
   <url>
     <loc>https://lyriko.xyz/songs/rema--calm-down-lyrics-and-meaning</loc>
-    <lastmod>2024-12-14</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
-
   <url>
     <loc>https://lyriko.xyz/songs/khalid--new-normal-lyrics-and-meaning</loc>
-    <lastmod>2024-12-21</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
-
   <url>
     <loc>https://lyriko.xyz/songs/chris-brown--loyal-lyrics-and-meaning</loc>
-    <lastmod>2024-12-14</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
-
   <url>
     <loc>https://lyriko.xyz/songs/alan-walker--unity-lyrics-and-meaning</loc>
-    <lastmod>2024-12-16</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
-
   <url>
     <loc>https://lyriko.xyz/songs/britney-spears--everytime-lyrics-and-meaning</loc>
-    <lastmod>2024-12-14</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
-
   <url>
     <loc>https://lyriko.xyz/songs/tyga--faded-lyrics-and-meaning</loc>
-    <lastmod>2024-12-21</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
-
   <url>
     <loc>https://lyriko.xyz/songs/skylar-grey--everything-i-need-lyrics-and-meaning</loc>
-    <lastmod>2024-12-22</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
-
   <url>
     <loc>https://lyriko.xyz/songs/c-line-dion--pour-que-tu-m-aimes-encore-lyrics-and-meaning</loc>
-    <lastmod>2024-12-21</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
-
   <url>
     <loc>https://lyriko.xyz/songs/alan-walker--faded-lyrics-and-meaning</loc>
-    <lastmod>2024-12-16</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
-
   <url>
     <loc>https://lyriko.xyz/songs/tayc--le-temps-lyrics-and-meaning</loc>
-    <lastmod>2024-12-21</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
-
   <url>
     <loc>https://lyriko.xyz/songs/mina--parole-parole-lyrics-and-meaning</loc>
-    <lastmod>2024-12-21</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
-
   <url>
     <loc>https://lyriko.xyz/songs/adele--hello-lyrics-and-meaning</loc>
-    <lastmod>2024-12-21</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
-
   <url>
     <loc>https://lyriko.xyz/songs/abba--super-trouper-lyrics-and-meaning</loc>
-    <lastmod>2024-12-14</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
-
   <url>
     <loc>https://lyriko.xyz/songs/drake--sandra-s-rose-lyrics-and-meaning</loc>
-    <lastmod>2024-12-14</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
-
   <url>
     <loc>https://lyriko.xyz/songs/drake--nonstop-lyrics-and-meaning</loc>
-    <lastmod>2024-12-14</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
-
   <url>
     <loc>https://lyriko.xyz/songs/ayra-starr--commas-lyrics-and-meaning</loc>
-    <lastmod>2024-12-17</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
-
   <url>
     <loc>https://lyriko.xyz/songs/bebe-rexha--knees-lyrics-and-meaning</loc>
-    <lastmod>2024-12-21</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
-
   <url>
     <loc>https://lyriko.xyz/songs/alan-walker--alone-lyrics-and-meaning</loc>
-    <lastmod>2024-12-17</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
-
   <url>
     <loc>https://lyriko.xyz/songs/justin-bieber--ghost-lyrics-and-meaning</loc>
-    <lastmod>2024-12-21</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
-
   <url>
     <loc>https://lyriko.xyz/songs/dua-lipa--these-walls-lyrics-and-meaning</loc>
-    <lastmod>2024-12-19</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
-
   <url>
     <loc>https://lyriko.xyz/songs/avicii--the-nights-lyrics-and-meaning</loc>
-    <lastmod>2024-12-21</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
-
   <url>
     <loc>https://lyriko.xyz/songs/avicii--hey-brother-lyrics-and-meaning</loc>
-    <lastmod>2024-12-16</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
-
   <url>
     <loc>https://lyriko.xyz/songs/aaliyah--more-than-a-woman-lyrics-and-meaning</loc>
-    <lastmod>2024-12-17</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
-
   <url>
     <loc>https://lyriko.xyz/songs/beyonc---halo-lyrics-and-meaning</loc>
-    <lastmod>2024-12-17</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
-
   <url>
     <loc>https://lyriko.xyz/songs/megan-thee-stallion--mamushi-lyrics-and-meaning</loc>
-    <lastmod>2024-12-17</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
-
   <url>
     <loc>https://lyriko.xyz/songs/jack-harlow--hello-miss-johnson-lyrics-and-meaning</loc>
-    <lastmod>2024-12-17</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
-
   <url>
     <loc>https://lyriko.xyz/songs/justin-timberlake--selfish-lyrics-and-meaning</loc>
-    <lastmod>2024-12-17</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
-
   <url>
     <loc>https://lyriko.xyz/songs/tate-mcrae--slower-lyrics-and-meaning</loc>
-    <lastmod>2024-12-17</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
-
   <url>
     <loc>https://lyriko.xyz/songs/beyonce--xo-lyrics-and-meaning</loc>
-    <lastmod>2024-12-20</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
-
   <url>
     <loc>https://lyriko.xyz/songs/dua-lipa--levitating-lyrics-and-meaning</loc>
-    <lastmod>2024-12-20</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
-
   <url>
     <loc>https://lyriko.xyz/songs/tyla--push-2-start-lyrics-and-meaning</loc>
-    <lastmod>2024-12-20</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
-
   <url>
     <loc>https://lyriko.xyz/songs/eminem--lose-yourself-lyrics-and-meaning</loc>
-    <lastmod>2024-12-20</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
-
   <url>
     <loc>https://lyriko.xyz/songs/lady-gaga--die-with-a-smile-lyrics-and-meaning</loc>
-    <lastmod>2024-12-20</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
-
   <url>
     <loc>https://lyriko.xyz/songs/stephen-sanchez--until-i-found-you-lyrics-and-meaning</loc>
-    <lastmod>2024-12-20</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
-
   <url>
     <loc>https://lyriko.xyz/songs/drake--family-matters-lyrics-and-meaning</loc>
-    <lastmod>2024-12-21</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
-
   <url>
     <loc>https://lyriko.xyz/songs/tyla--water-lyrics-and-meaning</loc>
-    <lastmod>2024-12-15</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
-
   <url>
     <loc>https://lyriko.xyz/songs/beyonce--hello-lyrics-and-meaning</loc>
-    <lastmod>2024-12-17</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
-
   <url>
     <loc>https://lyriko.xyz/songs/rihanna--te-amo-lyrics-and-meaning</loc>
-    <lastmod>2024-12-21</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
-
   <url>
     <loc>https://lyriko.xyz/songs/tyla--art-lyrics-and-meaning</loc>
-    <lastmod>2024-12-21</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
-
   <url>
     <loc>https://lyriko.xyz/songs/adele--when-we-were-young-lyrics-and-meaning</loc>
-    <lastmod>2024-12-21</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
-
   <url>
     <loc>https://lyriko.xyz/songs/ad-le--hello-lyrics-and-meaning</loc>
-    <lastmod>2024-12-22</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
-
   <url>
     <loc>https://lyriko.xyz/songs/brandy--piano-man-lyrics-and-meaning</loc>
-    <lastmod>2024-12-21</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
-
   <url>
     <loc>https://lyriko.xyz/songs/chris-brown--residuals-lyrics-and-meaning</loc>
-    <lastmod>2024-12-21</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
   </url>
 </urlset>
