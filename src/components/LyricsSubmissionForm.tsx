@@ -52,7 +52,7 @@ export const LyricsSubmissionForm = ({ artist: initialArtist, title: initialTitl
               content: text
             }
           ],
-          max_tokens: 500,
+          max_tokens: 5000,
           temperature: 0.3,
         })
       });
