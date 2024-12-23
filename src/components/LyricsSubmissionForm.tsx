@@ -43,7 +43,7 @@ export const LyricsSubmissionForm = ({ artist: initialArtist, title: initialTitl
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          model: 'gpt-4o', // Using the more capable model
+          model: 'gpt-4o-mini', // Switched back to mini model
           messages: [
             {
               role: 'system',
@@ -54,7 +54,7 @@ export const LyricsSubmissionForm = ({ artist: initialArtist, title: initialTitl
               content: text
             }
           ],
-          max_tokens: 8000, // Increased token limit
+          max_tokens: 8000, // Keeping increased token limit
           temperature: 0.3,
         })
       });

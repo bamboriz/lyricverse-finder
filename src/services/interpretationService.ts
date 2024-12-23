@@ -29,7 +29,7 @@ export const getAIInterpretation = async (lyrics: string, title: string, artist:
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o', // Using the more capable model
+        model: 'gpt-4o-mini', // Switched back to mini model
         messages: [
           {
             role: 'system',
@@ -40,7 +40,7 @@ export const getAIInterpretation = async (lyrics: string, title: string, artist:
             content: `Please interpret the lyrics of "${title}" by ${artist}:\n\n${lyrics}`
           }
         ],
-        max_tokens: 2000, // Increased token limit for interpretation
+        max_tokens: 2000, // Keeping increased token limit for interpretation
         temperature: 0.7,
       })
     });
