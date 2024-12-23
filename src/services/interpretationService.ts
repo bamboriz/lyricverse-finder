@@ -20,6 +20,8 @@ export const getAIInterpretation = async (lyrics: string, title: string, artist:
       throw new Error('OpenAI API key not configured');
     }
 
+    console.log('Lyrics length for interpretation:', lyrics.length); // Debug log
+
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -27,7 +29,7 @@ export const getAIInterpretation = async (lyrics: string, title: string, artist:
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
+        model: 'gpt-4o', // Using the more capable model
         messages: [
           {
             role: 'system',
@@ -38,7 +40,7 @@ export const getAIInterpretation = async (lyrics: string, title: string, artist:
             content: `Please interpret the lyrics of "${title}" by ${artist}:\n\n${lyrics}`
           }
         ],
-        max_tokens: 500,
+        max_tokens: 2000, // Increased token limit for interpretation
         temperature: 0.7,
       })
     });
@@ -50,7 +52,9 @@ export const getAIInterpretation = async (lyrics: string, title: string, artist:
     }
 
     const data = await response.json();
-    return data.choices[0].message.content;
+    const interpretation = data.choices[0].message.content;
+    console.log('Interpretation length:', interpretation.length); // Debug log
+    return interpretation;
   } catch (error) {
     console.error('Error in getAIInterpretation:', error);
     if (error instanceof Error) {

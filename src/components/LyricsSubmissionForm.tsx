@@ -34,6 +34,8 @@ export const LyricsSubmissionForm = ({ artist: initialArtist, title: initialTitl
         throw new Error('Failed to get API key');
       }
 
+      console.log('Input lyrics length:', text.length); // Debug log
+
       const response = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -41,7 +43,7 @@ export const LyricsSubmissionForm = ({ artist: initialArtist, title: initialTitl
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          model: 'gpt-4o-mini',
+          model: 'gpt-4o', // Using the more capable model
           messages: [
             {
               role: 'system',
@@ -52,17 +54,21 @@ export const LyricsSubmissionForm = ({ artist: initialArtist, title: initialTitl
               content: text
             }
           ],
-          max_tokens: 5000,
+          max_tokens: 8000, // Increased token limit
           temperature: 0.3,
         })
       });
 
       if (!response.ok) {
+        const errorData = await response.json();
+        console.error('OpenAI API error:', errorData); // Debug log
         throw new Error('Failed to format lyrics');
       }
 
       const data = await response.json();
-      return data.choices[0].message.content;
+      const formattedLyrics = data.choices[0].message.content;
+      console.log('Formatted lyrics length:', formattedLyrics.length); // Debug log
+      return formattedLyrics;
     } catch (error) {
       console.error('Error formatting lyrics:', error);
       throw error;
@@ -85,8 +91,11 @@ export const LyricsSubmissionForm = ({ artist: initialArtist, title: initialTitl
     const loadingToast = toast.loading("Processing lyrics...");
 
     try {
+      console.log('Original lyrics length:', lyrics.length); // Debug log
+      
       // Format the lyrics first
       const formattedLyrics = await formatLyrics(lyrics);
+      console.log('Final formatted lyrics length:', formattedLyrics.length); // Debug log
       
       // Get the interpretation
       const interpretation = await getAIInterpretation(formattedLyrics, title, artist);
