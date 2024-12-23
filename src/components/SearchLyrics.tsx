@@ -49,11 +49,13 @@ export const SearchLyrics = () => {
       } catch (error) {
         if (error instanceof Error) {
           toast.error(error.message);
+          setIsSearching(false);
         }
         throw error;
       }
     },
     enabled: false,
+    retry: false, // Don't retry failed queries
   });
 
   const handleSearch = async (e: React.FormEvent) => {
@@ -70,6 +72,7 @@ export const SearchLyrics = () => {
     try {
       await refetch();
     } catch (error) {
+      setIsSearching(false);
       // Error is already handled by the query
     }
   };

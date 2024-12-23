@@ -54,5 +54,6 @@ export const useSongData = (artist: string, title: string) => {
       }
     },
     enabled: !!artist && !!title,
+    retry: false, // Don't retry failed queries
   });
 };
