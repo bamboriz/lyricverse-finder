@@ -28,7 +28,6 @@ export const incrementSongHits = async (songId: number) => {
   }
 };
 
-// Add the missing exported functions
 export const fetchFromDatabase = async (artist: string, title: string) => {
   const { data, error } = await supabase
     .from("songs")
@@ -73,6 +72,20 @@ export const saveToDatabase = async (
   return data;
 };
 
+const fetchFromOVHApi = async (artist: string, title: string) => {
+  const response = await fetch(`https://api.lyrics.ovh/v1/${encodeURIComponent(artist)}/${encodeURIComponent(title)}`);
+  
+  if (!response.ok) {
+    if (response.status === 404) {
+      throw new Error(`No lyrics found for "${title}" by ${artist}`);
+    }
+    throw new Error('Failed to fetch lyrics from API');
+  }
+  
+  const data = await response.json();
+  return data.lyrics;
+};
+
 export const fetchLyrics = async ({ 
   artist, 
   title 
@@ -86,5 +99,12 @@ export const fetchLyrics = async ({
     return { lyrics: dbSong.lyrics };
   }
 
-  throw new Error(`No lyrics found for "${title}" by ${artist}`);
+  // If not in database, fetch from API
+  try {
+    const lyrics = await fetchFromOVHApi(artist, title);
+    return { lyrics };
+  } catch (error) {
+    console.error('Error fetching lyrics from API:', error);
+    throw error;
+  }
 };
