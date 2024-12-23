@@ -21,58 +21,20 @@ export const LyricsSubmissionForm = ({ artist: initialArtist, title: initialTitl
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
 
-  const formatLyrics = async (text: string) => {
-    try {
-      // Get the OpenAI API key from Supabase secrets
-      const { data: secretData, error: secretError } = await supabase
-        .from('secrets')
-        .select('value')
-        .eq('name', 'OPENAI_API_KEY')
-        .maybeSingle();
-
-      if (secretError || !secretData?.value) {
-        throw new Error('Failed to get API key');
-      }
-
-      console.log('Input lyrics length:', text.length); // Debug log
-
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${secretData.value}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          model: 'gpt-4o-mini', // Switched back to mini model
-          messages: [
-            {
-              role: 'system',
-              content: 'You are a lyrics formatting assistant. Format the given lyrics with proper line breaks and verse spacing. Keep the original words exactly as they are, just fix the formatting. Return only the formatted lyrics, no explanations.'
-            },
-            {
-              role: 'user',
-              content: text
-            }
-          ],
-          max_tokens: 8000, // Keeping increased token limit
-          temperature: 0.3,
-        })
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error('OpenAI API error:', errorData); // Debug log
-        throw new Error('Failed to format lyrics');
-      }
-
-      const data = await response.json();
-      const formattedLyrics = data.choices[0].message.content;
-      console.log('Formatted lyrics length:', formattedLyrics.length); // Debug log
-      return formattedLyrics;
-    } catch (error) {
-      console.error('Error formatting lyrics:', error);
-      throw error;
-    }
+  const formatLyrics = (text: string) => {
+    // Basic formatting:
+    // 1. Normalize line endings
+    // 2. Remove extra blank lines
+    // 3. Ensure consistent spacing
+    const formatted = text
+      .replace(/\r\n/g, '\n') // Normalize line endings
+      .replace(/\n{3,}/g, '\n\n') // Replace multiple blank lines with double line break
+      .trim(); // Remove leading/trailing whitespace
+    
+    console.log('Input lyrics length:', text.length);
+    console.log('Formatted lyrics length:', formatted.length);
+    
+    return formatted;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -91,11 +53,11 @@ export const LyricsSubmissionForm = ({ artist: initialArtist, title: initialTitl
     const loadingToast = toast.loading("Processing lyrics...");
 
     try {
-      console.log('Original lyrics length:', lyrics.length); // Debug log
+      console.log('Original lyrics length:', lyrics.length);
       
-      // Format the lyrics first
-      const formattedLyrics = await formatLyrics(lyrics);
-      console.log('Final formatted lyrics length:', formattedLyrics.length); // Debug log
+      // Format the lyrics using our local function
+      const formattedLyrics = formatLyrics(lyrics);
+      console.log('Final formatted lyrics length:', formattedLyrics.length);
       
       // Get the interpretation
       const interpretation = await getAIInterpretation(formattedLyrics, title, artist);
