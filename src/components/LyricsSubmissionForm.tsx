@@ -15,13 +15,18 @@ export const LyricsSubmissionForm = ({ artist, title, onSuccess }: LyricsSubmiss
   const [lyrics, setLyrics] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const formatLyrics = async (rawLyrics: string) => {
-    const { data, error } = await supabase.functions.invoke('format-lyrics', {
-      body: { lyrics: rawLyrics }
+  const formatLyrics = (rawLyrics: string) => {
+    // Split the lyrics into verses (double newlines indicate verse breaks)
+    const verses = rawLyrics.split(/\n\s*\n/);
+    
+    // Process each verse
+    const formattedVerses = verses.map(verse => {
+      // Split verse into lines and trim each line
+      return verse.trim();
     });
-
-    if (error) throw error;
-    return data.formattedLyrics;
+    
+    // Join verses back together with double newlines
+    return formattedVerses.filter(verse => verse.length > 0).join('\n\n');
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -33,8 +38,8 @@ export const LyricsSubmissionForm = ({ artist, title, onSuccess }: LyricsSubmiss
 
     setIsSubmitting(true);
     try {
-      // Format the lyrics first
-      const formattedLyrics = await formatLyrics(lyrics);
+      // Format the lyrics synchronously
+      const formattedLyrics = formatLyrics(lyrics);
       
       // Get interpretation
       const interpretation = await getAIInterpretation(formattedLyrics, title, artist);
