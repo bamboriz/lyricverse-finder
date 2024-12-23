@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { Button } from "./ui/button";
 import { Textarea } from "./ui/textarea";
+import { Input } from "./ui/input";
+import { Label } from "./ui/label";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -12,8 +14,10 @@ interface LyricsSubmissionFormProps {
   title: string;
 }
 
-export const LyricsSubmissionForm = ({ artist, title }: LyricsSubmissionFormProps) => {
+export const LyricsSubmissionForm = ({ artist: initialArtist, title: initialTitle }: LyricsSubmissionFormProps) => {
   const [lyrics, setLyrics] = useState("");
+  const [artist, setArtist] = useState(initialArtist);
+  const [title, setTitle] = useState(initialTitle);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
 
@@ -72,6 +76,11 @@ export const LyricsSubmissionForm = ({ artist, title }: LyricsSubmissionFormProp
       return;
     }
 
+    if (!artist.trim() || !title.trim()) {
+      toast.error("Please provide both artist and title");
+      return;
+    }
+
     setIsSubmitting(true);
     const loadingToast = toast.loading("Processing lyrics...");
 
@@ -86,8 +95,8 @@ export const LyricsSubmissionForm = ({ artist, title }: LyricsSubmissionFormProp
       const { error: saveError } = await supabase
         .from("songs")
         .upsert({
-          artist,
-          title,
+          artist: artist.trim(),
+          title: title.trim(),
           lyrics: formattedLyrics,
           interpretation
         });
@@ -98,10 +107,10 @@ export const LyricsSubmissionForm = ({ artist, title }: LyricsSubmissionFormProp
       toast.dismiss(loadingToast);
       toast.success("Lyrics added successfully!");
 
-      // Generate the new URL and navigate to it
-      const slug = generateSlug(artist, title);
+      // Generate the new URL with potentially corrected artist and title
+      const slug = generateSlug(artist.trim(), title.trim());
       
-      // Use replace instead of navigate to ensure the page refreshes
+      // Navigate to the new URL
       window.location.replace(`/songs/${slug}`);
     } catch (error) {
       console.error('Error submitting lyrics:', error);
@@ -112,14 +121,40 @@ export const LyricsSubmissionForm = ({ artist, title }: LyricsSubmissionFormProp
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <Textarea
-        value={lyrics}
-        onChange={(e) => setLyrics(e.target.value)}
-        placeholder="Paste the song lyrics here..."
-        className="min-h-[200px] font-mono"
-        disabled={isSubmitting}
-      />
+    <form onSubmit={handleSubmit} className="space-y-6">
+      <div className="grid gap-4 md:grid-cols-2">
+        <div className="space-y-2">
+          <Label htmlFor="artist">Artist</Label>
+          <Input
+            id="artist"
+            value={artist}
+            onChange={(e) => setArtist(e.target.value)}
+            placeholder="Artist name"
+            disabled={isSubmitting}
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="title">Title</Label>
+          <Input
+            id="title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="Song title"
+            disabled={isSubmitting}
+          />
+        </div>
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="lyrics">Lyrics</Label>
+        <Textarea
+          id="lyrics"
+          value={lyrics}
+          onChange={(e) => setLyrics(e.target.value)}
+          placeholder="Paste the song lyrics here..."
+          className="min-h-[200px] font-mono"
+          disabled={isSubmitting}
+        />
+      </div>
       <Button 
         type="submit" 
         disabled={isSubmitting}
