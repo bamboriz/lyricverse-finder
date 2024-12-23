@@ -2,10 +2,10 @@ import { useState } from "react";
 import { Button } from "./ui/button";
 import { Textarea } from "./ui/textarea";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { generateSlug } from "@/utils/urlUtils";
 import { getAIInterpretation } from "@/services/interpretationService";
-import { saveToDatabase } from "@/services/songService";
 
 interface LyricsSubmissionFormProps {
   artist: string;
@@ -17,16 +17,17 @@ export const LyricsSubmissionForm = ({ artist, title }: LyricsSubmissionFormProp
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
 
-  const formatLyrics = async (rawLyrics: string) => {
+  const formatLyrics = async (text: string) => {
     try {
-      const { data: secretData } = await supabase
+      // Get the OpenAI API key from Supabase secrets
+      const { data: secretData, error: secretError } = await supabase
         .from('secrets')
         .select('value')
         .eq('name', 'OPENAI_API_KEY')
-        .single();
+        .maybeSingle();
 
-      if (!secretData?.value) {
-        throw new Error('OpenAI API key not found');
+      if (secretError || !secretData?.value) {
+        throw new Error('Failed to get API key');
       }
 
       const response = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -40,11 +41,16 @@ export const LyricsSubmissionForm = ({ artist, title }: LyricsSubmissionFormProp
           messages: [
             {
               role: 'system',
-              content: 'You are a lyrics formatting assistant. Format the given lyrics with proper line breaks and verses. Remove any unnecessary text, annotations, or advertisements. Return only the formatted lyrics.'
+              content: 'You are a lyrics formatting assistant. Format the given lyrics with proper line breaks and verse spacing. Keep the original words exactly as they are, just fix the formatting. Return only the formatted lyrics, no explanations.'
             },
-            { role: 'user', content: rawLyrics }
+            {
+              role: 'user',
+              content: text
+            }
           ],
-        }),
+          max_tokens: 500,
+          temperature: 0.3,
+        })
       });
 
       if (!response.ok) {
@@ -62,29 +68,45 @@ export const LyricsSubmissionForm = ({ artist, title }: LyricsSubmissionFormProp
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!lyrics.trim()) {
-      toast.error("Please enter the lyrics");
+      toast.error("Please paste some lyrics first");
       return;
     }
 
     setIsSubmitting(true);
+    const loadingToast = toast.loading("Processing lyrics...");
+
     try {
-      // Format the lyrics
+      // Format the lyrics first
       const formattedLyrics = await formatLyrics(lyrics);
       
-      // Get interpretation
+      // Get the interpretation
       const interpretation = await getAIInterpretation(formattedLyrics, title, artist);
       
       // Save to database
-      await saveToDatabase(artist, title, formattedLyrics, interpretation);
-      
+      const { error: saveError } = await supabase
+        .from("songs")
+        .upsert({
+          artist,
+          title,
+          lyrics: formattedLyrics,
+          interpretation
+        });
+
+      if (saveError) throw saveError;
+
+      // Dismiss the loading toast and show success
+      toast.dismiss(loadingToast);
       toast.success("Lyrics added successfully!");
+
+      // Generate the new URL and navigate to it
+      const slug = generateSlug(artist, title);
       
-      // Navigate to the song page
-      navigate(`/songs/${artist.toLowerCase()}--${title.toLowerCase()}-lyrics-and-meaning`);
+      // Use replace instead of navigate to ensure the page refreshes
+      window.location.replace(`/songs/${slug}`);
     } catch (error) {
       console.error('Error submitting lyrics:', error);
-      toast.error(error instanceof Error ? error.message : "Failed to submit lyrics");
-    } finally {
+      toast.dismiss(loadingToast);
+      toast.error(error instanceof Error ? error.message : "Failed to process lyrics. Please try again.");
       setIsSubmitting(false);
     }
   };
@@ -92,14 +114,18 @@ export const LyricsSubmissionForm = ({ artist, title }: LyricsSubmissionFormProp
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <Textarea
-        placeholder="Paste the song lyrics here..."
         value={lyrics}
         onChange={(e) => setLyrics(e.target.value)}
-        className="min-h-[200px]"
+        placeholder="Paste the song lyrics here..."
+        className="min-h-[200px] font-mono"
         disabled={isSubmitting}
       />
-      <Button type="submit" disabled={isSubmitting}>
-        {isSubmitting ? "Submitting..." : "Submit Lyrics"}
+      <Button 
+        type="submit" 
+        disabled={isSubmitting}
+        className="w-full"
+      >
+        {isSubmitting ? "Processing..." : "Submit Lyrics"}
       </Button>
     </form>
   );
