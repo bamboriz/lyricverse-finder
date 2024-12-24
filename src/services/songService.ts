@@ -73,17 +73,32 @@ export const saveToDatabase = async (
 };
 
 const fetchFromOVHApi = async (artist: string, title: string) => {
-  const response = await fetch(`https://api.lyrics.ovh/v1/${encodeURIComponent(artist)}/${encodeURIComponent(title)}`);
-  
-  if (!response.ok) {
-    if (response.status === 404) {
-      throw new Error(`No lyrics found for "${title}" by ${artist}`);
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+
+  try {
+    const response = await fetch(
+      `https://api.lyrics.ovh/v1/${encodeURIComponent(artist)}/${encodeURIComponent(title)}`,
+      { signal: controller.signal }
+    );
+    
+    clearTimeout(timeoutId);
+    
+    if (!response.ok) {
+      if (response.status === 404) {
+        throw new Error(`No lyrics found for "${title}" by ${artist}`);
+      }
+      throw new Error('Failed to fetch lyrics from API');
     }
-    throw new Error('Failed to fetch lyrics from API');
+    
+    const data = await response.json();
+    return data.lyrics;
+  } catch (error) {
+    if (error instanceof Error && error.name === 'AbortError') {
+      throw new Error('Request timed out after 5 seconds');
+    }
+    throw error;
   }
-  
-  const data = await response.json();
-  return data.lyrics;
 };
 
 export const fetchLyrics = async ({ 
