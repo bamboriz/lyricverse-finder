@@ -22,7 +22,7 @@ export const LyricPreview = ({
         <textarea
           value={customLyric}
           onChange={(e) => setCustomLyric(e.target.value)}
-          className="absolute inset-0 w-full h-full bg-transparent text-white resize-none p-8 focus:outline-none font-serif whitespace-pre-wrap"
+          className="absolute inset-0 w-full h-full bg-transparent text-white resize-none p-8 focus:outline-none whitespace-pre-wrap"
           style={{
             background: 'transparent',
             border: 'none',
