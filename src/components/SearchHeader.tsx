@@ -1,6 +1,6 @@
 import { Search } from "lucide-react";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { SongSuggestions } from "./SongSuggestions";
 
 interface SearchHeaderProps {
   searchInput: string;
@@ -28,12 +28,13 @@ export const SearchHeader = ({
 
       <form onSubmit={onSearch} className="space-y-4">
         <div className="flex gap-4 flex-wrap">
-          <Input
-            placeholder="e.g. Tyla - Water"
-            value={searchInput}
-            onChange={(e) => onSearchInputChange(e.target.value)}
-            className="flex-1"
-          />
+          <div className="flex-1">
+            <SongSuggestions
+              onSelect={(artist, title) => {
+                onSearchInputChange(`${artist} - ${title}`);
+              }}
+            />
+          </div>
           <Button type="submit" className="whitespace-nowrap" disabled={isLoading}>
             <Search className="w-4 h-4 mr-2" />
             Search
