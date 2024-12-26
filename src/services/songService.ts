@@ -10,7 +10,7 @@ export const getSongByArtistAndTitle = async (
     .select("*")
     .eq("artist", artist)
     .eq("title", title)
-    .single();
+    .maybeSingle();
 
   if (error) {
     console.error("Error fetching song:", error);
@@ -34,7 +34,7 @@ export const fetchFromDatabase = async (artist: string, title: string) => {
     .select("*")
     .eq("artist", artist)
     .eq("title", title)
-    .single();
+    .maybeSingle();
 
   if (error) {
     console.error("Error fetching from database:", error);
@@ -62,7 +62,7 @@ export const saveToDatabase = async (
       { onConflict: 'artist,title' }
     )
     .select()
-    .single();
+    .maybeSingle();
 
   if (error) {
     console.error("Error saving to database:", error);
