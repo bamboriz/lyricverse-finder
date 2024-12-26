@@ -1,4 +1,4 @@
-import { capitalizeForDisplay } from "@/lib/utils";
+import { capitalizeForDisplay } from "@/utils/urlUtils";
 
 interface SongHeaderProps {
   title: string;
