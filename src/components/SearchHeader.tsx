@@ -16,7 +16,7 @@ export const SearchHeader = ({
   onSearch,
 }: SearchHeaderProps) => {
   return (
-    <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-sm py-4 px-4 shadow-sm">
+    <div className="sticky top-0 z-10 py-4 px-4">
       <div className="max-w-3xl mx-auto">
         <div className="text-center mb-8">
           <h1 className="text-5xl font-bold mb-3 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
