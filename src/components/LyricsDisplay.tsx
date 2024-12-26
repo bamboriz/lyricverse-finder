@@ -63,7 +63,7 @@ export const LyricsDisplay = ({
                 <div className="animate-pulse text-primary">Analyzing lyrics...</div>
               </div>
             ) : interpretation ? (
-              <div className="font-serif text-xl leading-relaxed text-gray-800 whitespace-pre-line">
+              <div className="text-lg leading-relaxed text-gray-800 whitespace-pre-line">
                 {interpretation}
               </div>
             ) : (
