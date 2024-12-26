@@ -5,6 +5,7 @@ import {
   CommandGroup,
   CommandInput,
   CommandItem,
+  CommandList,
 } from "@/components/ui/command";
 import {
   Popover,
@@ -75,28 +76,30 @@ export const SongSuggestions = ({ onSelect }: SongSuggestionsProps) => {
               }
             }}
           />
-          <CommandEmpty>
-            {isLoading ? (
-              <div className="py-6 text-center text-sm">Loading suggestions...</div>
-            ) : (
-              <div className="py-6 text-center text-sm">No songs found.</div>
-            )}
-          </CommandEmpty>
-          <CommandGroup>
-            {suggestions.map((song, index) => (
-              <CommandItem
-                key={`${song.artist.name}-${song.title}-${index}`}
-                onSelect={() => {
-                  onSelect(song.artist.name, song.title);
-                  setOpen(false);
-                  setSearchTerm(`${song.artist.name} - ${song.title}`);
-                }}
-              >
-                <Check className="mr-2 h-4 w-4 opacity-0" />
-                {song.artist.name} - {song.title}
-              </CommandItem>
-            ))}
-          </CommandGroup>
+          <CommandList>
+            <CommandEmpty>
+              {isLoading ? (
+                <div className="py-6 text-center text-sm">Loading suggestions...</div>
+              ) : (
+                <div className="py-6 text-center text-sm">No songs found.</div>
+              )}
+            </CommandEmpty>
+            <CommandGroup>
+              {suggestions.map((song, index) => (
+                <CommandItem
+                  key={`${song.artist.name}-${song.title}-${index}`}
+                  onSelect={() => {
+                    onSelect(song.artist.name, song.title);
+                    setOpen(false);
+                    setSearchTerm(`${song.artist.name} - ${song.title}`);
+                  }}
+                >
+                  <Check className="mr-2 h-4 w-4 opacity-0" />
+                  {song.artist.name} - {song.title}
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          </CommandList>
         </Command>
       </PopoverContent>
     </Popover>
