@@ -37,7 +37,7 @@ export const generateLyricImage = (
   // Calculate font size and line spacing
   const fontSize = 48;
   const lineHeight = fontSize * 1.8;
-  ctx.font = `${fontSize}px Garamond`;
+  ctx.font = `${fontSize}px Inter`;
 
   // Split text into paragraphs and then into lines that fit the canvas width
   const paragraphs = customLyric.split('\n');
