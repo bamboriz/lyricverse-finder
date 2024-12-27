@@ -1,11 +1,15 @@
 import { Command } from "cmdk";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { fetchLyrics } from "@/services/songService";
 import { toast } from "sonner";
 
 interface SongSuggestionsProps {
   onSelect: (artist: string, title: string) => void;
+}
+
+interface Suggestion {
+  artist: string;
+  title: string;
 }
 
 export function SongSuggestions({ onSelect }: SongSuggestionsProps) {
@@ -13,7 +17,7 @@ export function SongSuggestions({ onSelect }: SongSuggestionsProps) {
   const [inputValue, setInputValue] = useState("");
   const [searchValue, setSearchValue] = useState("");
   const [isSearching, setIsSearching] = useState(false);
-  const [searchResults, setSearchResults] = useState<Array<{ artist: string; title: string }>>([]);
+  const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
 
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
@@ -30,24 +34,30 @@ export function SongSuggestions({ onSelect }: SongSuggestionsProps) {
   // Debounced search effect
   useEffect(() => {
     if (!searchValue.trim()) {
-      setSearchResults([]);
+      setSuggestions([]);
       return;
     }
 
     const searchTimeout = setTimeout(async () => {
       setIsSearching(true);
       try {
-        // Try to parse artist and title from search input
-        const parts = searchValue.split('-');
-        if (parts.length === 2) {
-          const artist = parts[0].trim();
-          const title = parts[1].trim();
-          await fetchLyrics({ artist, title });
-          setSearchResults([{ artist, title }]);
+        const response = await fetch(`https://api.lyrics.ovh/suggest/${encodeURIComponent(searchValue)}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch suggestions');
         }
+        const data = await response.json();
+        
+        // Map the API response to our suggestion format
+        const formattedSuggestions = data.data.map((item: any) => ({
+          artist: item.artist.name,
+          title: item.title
+        })).slice(0, 5); // Limit to 5 suggestions
+        
+        setSuggestions(formattedSuggestions);
       } catch (error) {
         console.error('Search error:', error);
-        setSearchResults([]);
+        toast.error("Failed to fetch suggestions");
+        setSuggestions([]);
       } finally {
         setIsSearching(false);
       }
@@ -76,28 +86,28 @@ export function SongSuggestions({ onSelect }: SongSuggestionsProps) {
             value={searchValue}
             onValueChange={setSearchValue}
             className="w-full px-4 py-2 border-b"
-            placeholder='Enter "Artist - Song Title"'
+            placeholder="Search for songs or artists..."
           />
           <Command.List className="max-h-[300px] overflow-y-auto">
             {isSearching ? (
               <div className="px-4 py-2 text-sm text-gray-500">Searching...</div>
-            ) : searchResults.length === 0 ? (
-              <Command.Empty>No results found. Try "Artist - Song Title" format.</Command.Empty>
+            ) : suggestions.length === 0 ? (
+              <Command.Empty>No results found.</Command.Empty>
             ) : (
-              searchResults.map((result) => (
+              suggestions.map((suggestion) => (
                 <Command.Item
-                  key={`${result.artist}-${result.title}`}
-                  value={`${result.artist} - ${result.title}`}
+                  key={`${suggestion.artist}-${suggestion.title}`}
+                  value={`${suggestion.artist} - ${suggestion.title}`}
                   onSelect={() => {
-                    onSelect(result.artist, result.title);
+                    onSelect(suggestion.artist, suggestion.title);
                     setOpen(false);
-                    const fullValue = `${result.artist} - ${result.title}`;
+                    const fullValue = `${suggestion.artist} - ${suggestion.title}`;
                     setInputValue(fullValue);
                     setSearchValue("");
                   }}
                   className="px-4 py-2 hover:bg-accent cursor-pointer"
                 >
-                  {result.artist} - {result.title}
+                  {suggestion.artist} - {suggestion.title}
                 </Command.Item>
               ))
             )}
