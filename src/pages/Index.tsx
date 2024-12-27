@@ -19,7 +19,7 @@ const Index = () => {
           className="inline-flex items-center justify-center px-3 py-1 rounded-full bg-white/90 hover:bg-white transition-colors shadow-sm text-sm font-medium text-gray-800"
           aria-label="Follow us on TikTok"
         >
-          TikTok
+          Follow on TikTok
         </a>
       </div>
       <div className="relative z-10 py-12">
