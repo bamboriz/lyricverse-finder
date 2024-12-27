@@ -1,107 +1,77 @@
-import { Check, Search } from "lucide-react";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "@/components/ui/command";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Command } from "cmdk";
+import { useEffect, useState } from "react";
+import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
 
-interface SongSuggestion {
-  artist: {
-    name: string;
-  };
-  title: string;
-}
+const suggestions = [
+  { artist: "Taylor Swift", title: "Cruel Summer" },
+  { artist: "Drake", title: "Rich Flex" },
+  { artist: "The Weeknd", title: "Blinding Lights" },
+  { artist: "Bad Bunny", title: "Tití Me Preguntó" },
+  { artist: "Harry Styles", title: "As It Was" },
+];
 
 interface SongSuggestionsProps {
   onSelect: (artist: string, title: string) => void;
 }
 
-export const SongSuggestions = ({ onSelect }: SongSuggestionsProps) => {
+export function SongSuggestions({ onSelect }: SongSuggestionsProps) {
   const [open, setOpen] = useState(false);
-  const [suggestions, setSuggestions] = useState<SongSuggestion[]>([]);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const [inputValue, setInputValue] = useState("");
 
-  const fetchSuggestions = async (value: string) => {
-    if (!value) return;
-    
-    setIsLoading(true);
-    try {
-      const response = await fetch(
-        `https://api.lyrics.ovh/suggest/${encodeURIComponent(value)}`
-      );
-      if (!response.ok) throw new Error('Failed to fetch suggestions');
-      const data = await response.json();
-      setSuggestions(data.data || []);
-    } catch (error) {
-      console.error('Error fetching suggestions:', error);
-      setSuggestions([]);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  useEffect(() => {
+    const down = (e: KeyboardEvent) => {
+      if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        setOpen((open) => !open);
+      }
+    };
+
+    document.addEventListener("keydown", down);
+    return () => document.removeEventListener("keydown", down);
+  }, []);
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
+    <Command className="relative">
+      <div>
         <Button
+          type="button"
           variant="outline"
           role="combobox"
           aria-expanded={open}
           className="w-full justify-between"
+          onClick={() => setOpen((open) => !open)}
         >
-          {searchTerm || "Search for a song..."}
-          <Search className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+          {inputValue || "Search songs..."}
         </Button>
-      </PopoverTrigger>
-      <PopoverContent className="w-[400px] p-0">
-        <Command shouldFilter={false}>
-          <CommandInput 
-            placeholder="Type to search..." 
-            value={searchTerm}
-            onValueChange={(search) => {
-              setSearchTerm(search);
-              if (search.length >= 2) {
-                fetchSuggestions(search);
-              }
-            }}
+      </div>
+      {open && (
+        <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-md shadow-lg border overflow-hidden z-50">
+          <Command.Input
+            value={inputValue}
+            onValueChange={setInputValue}
+            className="w-full px-4 py-2 border-b"
+            placeholder="Search songs..."
           />
-          <CommandList>
-            <CommandEmpty>
-              {isLoading ? (
-                <div className="py-6 text-center text-sm">Loading suggestions...</div>
-              ) : (
-                <div className="py-6 text-center text-sm">No songs found.</div>
-              )}
-            </CommandEmpty>
-            <CommandGroup>
-              {suggestions.map((song, index) => (
-                <CommandItem
-                  key={`${song.artist.name}-${song.title}-${index}`}
-                  onSelect={() => {
-                    onSelect(song.artist.name, song.title);
-                    setOpen(false);
-                    setSearchTerm(`${song.artist.name} - ${song.title}`);
-                  }}
-                >
-                  <Check className="mr-2 h-4 w-4 opacity-0" />
-                  {song.artist.name} - {song.title}
-                </CommandItem>
-              ))}
-            </CommandGroup>
-          </CommandList>
-        </Command>
-      </PopoverContent>
-    </Popover>
+          <Command.List className="max-h-[300px] overflow-y-auto">
+            <Command.Empty>No results found.</Command.Empty>
+            {suggestions.map((suggestion) => (
+              <Command.Item
+                key={`${suggestion.artist}-${suggestion.title}`}
+                value={`${suggestion.artist} - ${suggestion.title}`}
+                onSelect={() => {
+                  onSelect(suggestion.artist, suggestion.title);
+                  setOpen(false);
+                  setInputValue(`${suggestion.artist} - ${suggestion.title}`);
+                }}
+                className="px-4 py-2 hover:bg-accent cursor-pointer"
+              >
+                {suggestion.artist} - {suggestion.title}
+              </Command.Item>
+            ))}
+          </Command.List>
+        </div>
+      )}
+    </Command>
   );
-};
+}
