@@ -1,14 +1,8 @@
 import { Command } from "cmdk";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-
-const suggestions = [
-  { artist: "Taylor Swift", title: "Cruel Summer" },
-  { artist: "Drake", title: "Rich Flex" },
-  { artist: "The Weeknd", title: "Blinding Lights" },
-  { artist: "Bad Bunny", title: "Tití Me Preguntó" },
-  { artist: "Harry Styles", title: "As It Was" },
-];
+import { fetchLyrics } from "@/services/songService";
+import { toast } from "sonner";
 
 interface SongSuggestionsProps {
   onSelect: (artist: string, title: string) => void;
@@ -18,6 +12,8 @@ export function SongSuggestions({ onSelect }: SongSuggestionsProps) {
   const [open, setOpen] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const [searchValue, setSearchValue] = useState("");
+  const [isSearching, setIsSearching] = useState(false);
+  const [searchResults, setSearchResults] = useState<Array<{ artist: string; title: string }>>([]);
 
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
@@ -31,11 +27,34 @@ export function SongSuggestions({ onSelect }: SongSuggestionsProps) {
     return () => document.removeEventListener("keydown", down);
   }, []);
 
-  const filteredSuggestions = suggestions.filter((suggestion) => {
-    const searchTerm = searchValue.toLowerCase();
-    const fullString = `${suggestion.artist} - ${suggestion.title}`.toLowerCase();
-    return fullString.includes(searchTerm);
-  });
+  // Debounced search effect
+  useEffect(() => {
+    if (!searchValue.trim()) {
+      setSearchResults([]);
+      return;
+    }
+
+    const searchTimeout = setTimeout(async () => {
+      setIsSearching(true);
+      try {
+        // Try to parse artist and title from search input
+        const parts = searchValue.split('-');
+        if (parts.length === 2) {
+          const artist = parts[0].trim();
+          const title = parts[1].trim();
+          await fetchLyrics({ artist, title });
+          setSearchResults([{ artist, title }]);
+        }
+      } catch (error) {
+        console.error('Search error:', error);
+        setSearchResults([]);
+      } finally {
+        setIsSearching(false);
+      }
+    }, 500); // 500ms debounce
+
+    return () => clearTimeout(searchTimeout);
+  }, [searchValue]);
 
   return (
     <Command className="relative">
@@ -57,26 +76,28 @@ export function SongSuggestions({ onSelect }: SongSuggestionsProps) {
             value={searchValue}
             onValueChange={setSearchValue}
             className="w-full px-4 py-2 border-b"
-            placeholder="Search songs..."
+            placeholder='Enter "Artist - Song Title"'
           />
           <Command.List className="max-h-[300px] overflow-y-auto">
-            {filteredSuggestions.length === 0 ? (
-              <Command.Empty>No results found.</Command.Empty>
+            {isSearching ? (
+              <div className="px-4 py-2 text-sm text-gray-500">Searching...</div>
+            ) : searchResults.length === 0 ? (
+              <Command.Empty>No results found. Try "Artist - Song Title" format.</Command.Empty>
             ) : (
-              filteredSuggestions.map((suggestion) => (
+              searchResults.map((result) => (
                 <Command.Item
-                  key={`${suggestion.artist}-${suggestion.title}`}
-                  value={`${suggestion.artist} - ${suggestion.title}`}
+                  key={`${result.artist}-${result.title}`}
+                  value={`${result.artist} - ${result.title}`}
                   onSelect={() => {
-                    onSelect(suggestion.artist, suggestion.title);
+                    onSelect(result.artist, result.title);
                     setOpen(false);
-                    const fullValue = `${suggestion.artist} - ${suggestion.title}`;
+                    const fullValue = `${result.artist} - ${result.title}`;
                     setInputValue(fullValue);
                     setSearchValue("");
                   }}
                   className="px-4 py-2 hover:bg-accent cursor-pointer"
                 >
-                  {suggestion.artist} - {suggestion.title}
+                  {result.artist} - {result.title}
                 </Command.Item>
               ))
             )}
