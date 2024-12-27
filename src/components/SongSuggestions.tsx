@@ -1,6 +1,5 @@
 import { Command } from "cmdk";
 import { useEffect, useState } from "react";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
 const suggestions = [
@@ -18,6 +17,7 @@ interface SongSuggestionsProps {
 export function SongSuggestions({ onSelect }: SongSuggestionsProps) {
   const [open, setOpen] = useState(false);
   const [inputValue, setInputValue] = useState("");
+  const [searchValue, setSearchValue] = useState("");
 
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
@@ -32,11 +32,9 @@ export function SongSuggestions({ onSelect }: SongSuggestionsProps) {
   }, []);
 
   const filteredSuggestions = suggestions.filter((suggestion) => {
-    const searchTerm = inputValue.toLowerCase();
-    return (
-      suggestion.artist.toLowerCase().includes(searchTerm) ||
-      suggestion.title.toLowerCase().includes(searchTerm)
-    );
+    const searchTerm = searchValue.toLowerCase();
+    const fullString = `${suggestion.artist} - ${suggestion.title}`.toLowerCase();
+    return fullString.includes(searchTerm);
   });
 
   return (
@@ -56,8 +54,8 @@ export function SongSuggestions({ onSelect }: SongSuggestionsProps) {
       {open && (
         <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-md shadow-lg border overflow-hidden z-50">
           <Command.Input
-            value={inputValue}
-            onValueChange={setInputValue}
+            value={searchValue}
+            onValueChange={setSearchValue}
             className="w-full px-4 py-2 border-b"
             placeholder="Search songs..."
           />
@@ -72,7 +70,9 @@ export function SongSuggestions({ onSelect }: SongSuggestionsProps) {
                   onSelect={() => {
                     onSelect(suggestion.artist, suggestion.title);
                     setOpen(false);
-                    setInputValue(`${suggestion.artist} - ${suggestion.title}`);
+                    const fullValue = `${suggestion.artist} - ${suggestion.title}`;
+                    setInputValue(fullValue);
+                    setSearchValue("");
                   }}
                   className="px-4 py-2 hover:bg-accent cursor-pointer"
                 >
