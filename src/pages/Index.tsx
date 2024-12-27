@@ -1,6 +1,5 @@
 import { SearchLyrics } from "@/components/SearchLyrics";
 import { Helmet } from "react-helmet";
-import { TiktokIcon } from "lucide-react";
 
 const Index = () => {
   return (
@@ -17,10 +16,10 @@ const Index = () => {
           href="https://www.tiktok.com/@lyrikoxyz" 
           target="_blank" 
           rel="noopener noreferrer"
-          className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/90 hover:bg-white transition-colors shadow-sm"
+          className="inline-flex items-center justify-center px-3 py-1 rounded-full bg-white/90 hover:bg-white transition-colors shadow-sm text-sm font-medium text-gray-800"
           aria-label="Follow us on TikTok"
         >
-          <TiktokIcon className="w-5 h-5 text-gray-800" />
+          TikTok
         </a>
       </div>
       <div className="relative z-10 py-12">
