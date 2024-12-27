@@ -1,6 +1,7 @@
 import { Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SongSuggestions } from "./SongSuggestions";
+import { Link } from "react-router-dom";
 
 interface SearchHeaderProps {
   searchInput: string;
@@ -18,9 +19,11 @@ export const SearchHeader = ({
   return (
     <div className="max-w-3xl mx-auto px-4 mb-12 animate-fade-up">
       <div className="text-center mb-8">
-        <h1 className="text-5xl font-bold mb-3 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-          Lyriko
-        </h1>
+        <Link to="/" className="inline-block hover:opacity-80 transition-opacity">
+          <h1 className="text-5xl font-bold mb-3 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+            Lyriko
+          </h1>
+        </Link>
         <p className="text-gray-600">
           Search for your favorite song lyrics and get AI interpretation
         </p>
