@@ -69,7 +69,7 @@ export const Song = () => {
   const { data: song, isLoading } = useSongData(artist, title);
 
   const handleTikTokFollow = () => {
-    window.open('https://www.tiktok.com/@lyricsai', '_blank');
+    window.open('https://www.tiktok.com/@lyrikoxyz', '_blank');
   };
 
   if (isLoading) {
