@@ -31,6 +31,14 @@ export function SongSuggestions({ onSelect }: SongSuggestionsProps) {
     return () => document.removeEventListener("keydown", down);
   }, []);
 
+  const filteredSuggestions = suggestions.filter((suggestion) => {
+    const searchTerm = inputValue.toLowerCase();
+    return (
+      suggestion.artist.toLowerCase().includes(searchTerm) ||
+      suggestion.title.toLowerCase().includes(searchTerm)
+    );
+  });
+
   return (
     <Command className="relative">
       <div>
@@ -54,21 +62,24 @@ export function SongSuggestions({ onSelect }: SongSuggestionsProps) {
             placeholder="Search songs..."
           />
           <Command.List className="max-h-[300px] overflow-y-auto">
-            <Command.Empty>No results found.</Command.Empty>
-            {suggestions.map((suggestion) => (
-              <Command.Item
-                key={`${suggestion.artist}-${suggestion.title}`}
-                value={`${suggestion.artist} - ${suggestion.title}`}
-                onSelect={() => {
-                  onSelect(suggestion.artist, suggestion.title);
-                  setOpen(false);
-                  setInputValue(`${suggestion.artist} - ${suggestion.title}`);
-                }}
-                className="px-4 py-2 hover:bg-accent cursor-pointer"
-              >
-                {suggestion.artist} - {suggestion.title}
-              </Command.Item>
-            ))}
+            {filteredSuggestions.length === 0 ? (
+              <Command.Empty>No results found.</Command.Empty>
+            ) : (
+              filteredSuggestions.map((suggestion) => (
+                <Command.Item
+                  key={`${suggestion.artist}-${suggestion.title}`}
+                  value={`${suggestion.artist} - ${suggestion.title}`}
+                  onSelect={() => {
+                    onSelect(suggestion.artist, suggestion.title);
+                    setOpen(false);
+                    setInputValue(`${suggestion.artist} - ${suggestion.title}`);
+                  }}
+                  className="px-4 py-2 hover:bg-accent cursor-pointer"
+                >
+                  {suggestion.artist} - {suggestion.title}
+                </Command.Item>
+              ))
+            )}
           </Command.List>
         </div>
       )}
