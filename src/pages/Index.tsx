@@ -11,18 +11,18 @@ const Index = () => {
         <meta property="og:url" content="https://lyriko.xyz" />
         <meta property="og:type" content="website" />
       </Helmet>
-      <div className="absolute top-4 right-4 z-20">
+      <div className="absolute right-0 top-0 p-4 md:p-6 w-full flex justify-end">
         <a 
           href="https://www.tiktok.com/@lyrikoxyz" 
           target="_blank" 
           rel="noopener noreferrer"
-          className="inline-flex items-center justify-center px-3 py-1 rounded-full bg-white/90 hover:bg-white transition-colors shadow-sm text-sm font-medium text-gray-800"
+          className="inline-flex items-center justify-center px-3 py-1.5 rounded-full bg-white/90 hover:bg-white transition-colors shadow-sm text-xs md:text-sm font-medium text-gray-800 hover:scale-105 transform transition-transform duration-200"
           aria-label="Follow us on TikTok"
         >
           Follow on TikTok
         </a>
       </div>
-      <div className="relative z-10 py-12">
+      <div className="relative z-10 py-8 md:py-12">
         <SearchLyrics />
       </div>
     </div>
