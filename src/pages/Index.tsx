@@ -1,6 +1,6 @@
 import { SearchLyrics } from "@/components/SearchLyrics";
 import { Helmet } from "react-helmet";
-import { Tiktok } from "lucide-react";
+import { BrandsTiktok } from "lucide-react";
 
 const Index = () => {
   return (
@@ -20,7 +20,7 @@ const Index = () => {
           className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-white/90 hover:bg-white transition-colors shadow-sm"
           aria-label="Follow us on TikTok"
         >
-          <Tiktok className="w-5 h-5 text-gray-800" />
+          <BrandsTiktok className="w-5 h-5 text-gray-800" />
         </a>
       </div>
       <div className="relative z-10 py-12">
