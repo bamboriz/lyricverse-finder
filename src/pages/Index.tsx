@@ -22,7 +22,7 @@ const Index = () => {
           Follow on TikTok
         </a>
       </div>
-      <div className="relative z-10 py-8 md:py-12">
+      <div className="relative z-10 mt-16 md:mt-24 py-8 md:py-12">
         <SearchLyrics />
       </div>
     </div>
