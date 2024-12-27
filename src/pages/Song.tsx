@@ -9,6 +9,7 @@ import { generateSlug, parseSlugForDirectAccess } from "@/utils/urlUtils";
 import { useSongData } from "@/hooks/useSongData";
 import { LoadingState } from "@/components/song/LoadingState";
 import { SongHeader } from "@/components/song/SongHeader";
+import { Button } from "@/components/ui/button";
 
 export const Song = () => {
   const location = useLocation();
@@ -67,6 +68,10 @@ export const Song = () => {
   
   const { data: song, isLoading } = useSongData(artist, title);
 
+  const handleTikTokFollow = () => {
+    window.open('https://www.tiktok.com/@lyricsai', '_blank');
+  };
+
   if (isLoading) {
     return <LoadingState />;
   }
@@ -99,7 +104,15 @@ export const Song = () => {
         onSearch={handleSearch}
       />
       
-      <SongHeader title={song?.title || title} artist={song?.artist || artist} />
+      <div className="flex flex-col items-center mb-8">
+        <SongHeader title={song?.title || title} artist={song?.artist || artist} />
+        <Button
+          onClick={handleTikTokFollow}
+          className="bg-black hover:bg-gray-800 text-white"
+        >
+          Follow us on TikTok
+        </Button>
+      </div>
       
       {song?.lyrics && (
         <LyricsDisplay 
