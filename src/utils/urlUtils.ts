@@ -1,9 +1,17 @@
 const normalizeText = (text: string): string => {
-  // First convert to lowercase
+  if (!text) return '';
+  
+  // Convert to lowercase first
   const lowercased = text.toLowerCase();
   
   // Replace accented characters with their non-accented equivalents
-  const withoutAccents = lowercased.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  // Using a more comprehensive approach
+  const withoutAccents = lowercased
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[œ]/g, 'oe')
+    .replace(/[æ]/g, 'ae')
+    .replace(/[ø]/g, 'o');
   
   // Replace any remaining non-alphanumeric characters with hyphens
   const withHyphens = withoutAccents.replace(/[^a-z0-9]+/g, '-');
