@@ -1,10 +1,13 @@
 const normalizeText = (text: string): string => {
   return text
     .toLowerCase()
-    // Normalize accented characters to their basic latin equivalents
+    // First normalize accented characters to their basic latin equivalents
     .normalize('NFKD')
     .replace(/[\u0300-\u036f]/g, '')
-    .replace(/[^a-z0-9]+/g, '-');
+    // Then replace any remaining non-alphanumeric characters with hyphens
+    .replace(/[^a-z0-9]+/g, '-')
+    // Remove any leading or trailing hyphens
+    .replace(/^-+|-+$/g, '');
 };
 
 export const generateSlug = (artist: string, title: string) => {
