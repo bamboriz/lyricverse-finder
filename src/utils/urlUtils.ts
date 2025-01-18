@@ -4,14 +4,29 @@ const normalizeText = (text: string): string => {
   // Convert to lowercase first
   const lowercased = text.toLowerCase();
   
+  // Create a mapping of accented characters to their non-accented equivalents
+  const accentMap: { [key: string]: string } = {
+    'é': 'e',
+    'è': 'e',
+    'ê': 'e',
+    'ë': 'e',
+    'à': 'a',
+    'â': 'a',
+    'ä': 'a',
+    'î': 'i',
+    'ï': 'i',
+    'ô': 'o',
+    'ö': 'o',
+    'ù': 'u',
+    'û': 'u',
+    'ü': 'u',
+    'ÿ': 'y',
+    'ñ': 'n',
+    'ç': 'c'
+  };
+  
   // Replace accented characters with their non-accented equivalents
-  // Using a more comprehensive approach
-  const withoutAccents = lowercased
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/[œ]/g, 'oe')
-    .replace(/[æ]/g, 'ae')
-    .replace(/[ø]/g, 'o');
+  const withoutAccents = lowercased.split('').map(char => accentMap[char] || char).join('');
   
   // Replace any remaining non-alphanumeric characters with hyphens
   const withHyphens = withoutAccents.replace(/[^a-z0-9]+/g, '-');
