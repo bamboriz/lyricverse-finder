@@ -28,7 +28,7 @@ export const parseSlugForDirectAccess = (slug: string): { artist: string; title:
     throw new Error('Invalid URL format: missing artist-title separator');
   }
 
-  // Convert hyphens back to spaces for both artist and title
+  // Convert hyphens back to spaces and normalize the text
   const artist = parts[0].replace(/-/g, ' ').trim();
   const title = parts[1].replace(/-/g, ' ').trim();
 
