@@ -1,35 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 import { Tables } from "@/integrations/supabase/types";
 
-export const getSongByArtistAndTitle = async (
-  artist: string,
-  title: string
-): Promise<Tables<"songs"> | null> => {
-  console.log('Searching for song with artist:', artist, 'and title:', title);
-  const { data, error } = await supabase
-    .from("songs")
-    .select("*")
-    .filter('artist', 'ilike', artist)
-    .filter('title', 'ilike', title)
-    .maybeSingle();
-
-  if (error) {
-    console.error("Error fetching song:", error);
-    return null;
-  }
-
-  console.log('Found song in database:', data);
-  return data;
-};
-
-export const incrementSongHits = async (songId: number) => {
-  const { error } = await supabase.rpc('increment_song_hits', { song_id: songId });
-  
-  if (error) {
-    console.error("Error incrementing song hits:", error);
-  }
-};
-
 export const fetchFromDatabase = async (artist: string, title: string) => {
   console.log('Fetching from database - artist:', artist, 'title:', title);
   
@@ -47,6 +18,14 @@ export const fetchFromDatabase = async (artist: string, title: string) => {
 
   console.log('Database fetch result:', data);
   return data;
+};
+
+export const incrementSongHits = async (songId: number) => {
+  const { error } = await supabase.rpc('increment_song_hits', { song_id: songId });
+  
+  if (error) {
+    console.error("Error incrementing song hits:", error);
+  }
 };
 
 export const saveToDatabase = async (
