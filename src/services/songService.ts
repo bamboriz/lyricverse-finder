@@ -1,14 +1,16 @@
 import { supabase } from "@/integrations/supabase/client";
 import { Tables } from "@/integrations/supabase/types";
 
-export const fetchFromDatabase = async (artist: string, title: string) => {
+export type Song = Tables<"songs">;
+
+export const fetchFromDatabase = async (artist: string, title: string): Promise<Song | null> => {
   console.log('Fetching from database - artist:', artist, 'title:', title);
   
   const { data, error } = await supabase
-    .rpc('search_songs_with_unaccent', {
-      p_artist: artist,
-      p_title: title
-    })
+    .from("songs")
+    .select("*")
+    .filter('artist', 'ilike', artist)
+    .filter('title', 'ilike', title)
     .maybeSingle();
 
   if (error) {
