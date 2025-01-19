@@ -8,8 +8,8 @@ export const getSongByArtistAndTitle = async (
   const { data, error } = await supabase
     .from("songs")
     .select("*")
-    .eq("artist", artist)
-    .eq("title", title)
+    .ilike("artist", artist)
+    .ilike("title", title)
     .maybeSingle();
 
   if (error) {
@@ -32,8 +32,8 @@ export const fetchFromDatabase = async (artist: string, title: string) => {
   const { data, error } = await supabase
     .from("songs")
     .select("*")
-    .eq("artist", artist)
-    .eq("title", title)
+    .ilike("artist", artist)
+    .ilike("title", title)
     .maybeSingle();
 
   if (error) {
