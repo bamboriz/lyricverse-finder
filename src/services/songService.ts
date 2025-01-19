@@ -9,8 +9,8 @@ export const getSongByArtistAndTitle = async (
   const { data, error } = await supabase
     .from("songs")
     .select("*")
-    .ilike("artist", artist)
-    .ilike("title", title)
+    .filter('artist', 'ilike', artist)
+    .filter('title', 'ilike', title)
     .maybeSingle();
 
   if (error) {
@@ -34,10 +34,10 @@ export const fetchFromDatabase = async (artist: string, title: string) => {
   console.log('Fetching from database - artist:', artist, 'title:', title);
   
   const { data, error } = await supabase
-    .from("songs")
-    .select("*")
-    .ilike("artist", artist)
-    .ilike("title", title)
+    .rpc('search_songs_with_unaccent', {
+      p_artist: artist,
+      p_title: title
+    })
     .maybeSingle();
 
   if (error) {
