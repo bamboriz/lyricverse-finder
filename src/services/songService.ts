@@ -36,8 +36,8 @@ export const fetchFromDatabase = async (artist: string, title: string) => {
   const { data, error } = await supabase
     .from("songs")
     .select("*")
-    .ilike("artist", artist)
-    .ilike("title", title)
+    .filter('artist COLLATE utf8mb4_0900_ai_ci', 'ilike', artist)
+    .filter('title COLLATE utf8mb4_0900_ai_ci', 'ilike', title)
     .maybeSingle();
 
   if (error) {
@@ -78,6 +78,32 @@ export const saveToDatabase = async (
   return data;
 };
 
+export const fetchLyrics = async ({ 
+  artist, 
+  title 
+}: { 
+  artist: string; 
+  title: string;
+}) => {
+  console.log('Starting lyrics fetch for:', { artist, title });
+  // First try to get from database
+  const dbSong = await fetchFromDatabase(artist, title);
+  if (dbSong?.lyrics) {
+    console.log('Found lyrics in database');
+    return { lyrics: dbSong.lyrics };
+  }
+
+  // If not in database, fetch from API
+  try {
+    console.log('No lyrics in database, trying API');
+    const lyrics = await fetchFromOVHApi(artist, title);
+    return { lyrics };
+  } catch (error) {
+    console.error('Error fetching lyrics from API:', error);
+    throw error;
+  }
+};
+
 const fetchFromOVHApi = async (artist: string, title: string) => {
   console.log('Fetching from OVH API - artist:', artist, 'title:', title);
   const controller = new AbortController();
@@ -105,32 +131,6 @@ const fetchFromOVHApi = async (artist: string, title: string) => {
     if (error instanceof Error && error.name === 'AbortError') {
       throw new Error('Request timed out after 5 seconds');
     }
-    throw error;
-  }
-};
-
-export const fetchLyrics = async ({ 
-  artist, 
-  title 
-}: { 
-  artist: string; 
-  title: string;
-}) => {
-  console.log('Starting lyrics fetch for:', { artist, title });
-  // First try to get from database
-  const dbSong = await fetchFromDatabase(artist, title);
-  if (dbSong?.lyrics) {
-    console.log('Found lyrics in database');
-    return { lyrics: dbSong.lyrics };
-  }
-
-  // If not in database, fetch from API
-  try {
-    console.log('No lyrics in database, trying API');
-    const lyrics = await fetchFromOVHApi(artist, title);
-    return { lyrics };
-  } catch (error) {
-    console.error('Error fetching lyrics from API:', error);
     throw error;
   }
 };
