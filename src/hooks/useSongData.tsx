@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { fetchFromDatabase, fetchLyrics, saveToDatabase, type Song } from "@/services/songService";
+import { fetchFromDatabase, fetchLyrics, saveToDatabase, incrementSongHits, type Song } from "@/services/songService";
 import { getAIInterpretation } from "@/services/interpretationService";
 import { toast } from "sonner";
 
@@ -13,8 +13,9 @@ export const useSongData = (artist: string, title: string) => {
         // First try to get from database
         const dbSong = await fetchFromDatabase(artist, title);
         
-        // If we have both lyrics and interpretation, return it
+        // If we have both lyrics and interpretation, increment hits and return
         if (dbSong && dbSong.lyrics && dbSong.interpretation) {
+          await incrementSongHits(dbSong.id);
           return dbSong;
         }
 
@@ -22,6 +23,7 @@ export const useSongData = (artist: string, title: string) => {
         if (dbSong && dbSong.lyrics && !dbSong.interpretation) {
           const interpretation = await getAIInterpretation(dbSong.lyrics, title, artist);
           const updatedSong = await saveToDatabase(artist, title, dbSong.lyrics, interpretation);
+          await incrementSongHits(updatedSong.id);
           return updatedSong;
         }
 
@@ -37,6 +39,9 @@ export const useSongData = (artist: string, title: string) => {
         
         // Save everything to database
         const savedSong = await saveToDatabase(artist, title, apiResult.lyrics, interpretation);
+        
+        // Increment hits for the newly saved song
+        await incrementSongHits(savedSong.id);
         
         return savedSong;
       } catch (error) {
