@@ -36,8 +36,8 @@ export const fetchFromDatabase = async (artist: string, title: string) => {
   const { data, error } = await supabase
     .from("songs")
     .select("*")
-    .filter('artist COLLATE utf8mb4_0900_ai_ci', 'ilike', artist)
-    .filter('title COLLATE utf8mb4_0900_ai_ci', 'ilike', title)
+    .ilike("artist", artist)
+    .ilike("title", title)
     .maybeSingle();
 
   if (error) {
