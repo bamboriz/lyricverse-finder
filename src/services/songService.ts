@@ -7,10 +7,10 @@ export const fetchFromDatabase = async (artist: string, title: string): Promise<
   console.log('Fetching from database - artist:', artist, 'title:', title);
   
   const { data, error } = await supabase
-    .from("songs")
-    .select("*")
-    .filter('artist', 'ilike', artist)
-    .filter('title', 'ilike', title)
+    .rpc('search_songs_with_unaccent', {
+      p_artist: artist,
+      p_title: title
+    })
     .maybeSingle();
 
   if (error) {
@@ -20,14 +20,6 @@ export const fetchFromDatabase = async (artist: string, title: string): Promise<
 
   console.log('Database fetch result:', data);
   return data;
-};
-
-export const incrementSongHits = async (songId: number) => {
-  const { error } = await supabase.rpc('increment_song_hits', { song_id: songId });
-  
-  if (error) {
-    console.error("Error incrementing song hits:", error);
-  }
 };
 
 export const saveToDatabase = async (
