@@ -79,6 +79,21 @@ export type Database = {
         }
         Returns: undefined
       }
+      search_songs_with_unaccent: {
+        Args: {
+          p_artist: string
+          p_title: string
+        }
+        Returns: {
+          id: number
+          artist: string
+          title: string
+          lyrics: string
+          interpretation: string
+          created_at: string
+          hits: number
+        }[]
+      }
       unaccent: {
         Args: {
           "": string

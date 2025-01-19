@@ -35,7 +35,7 @@ export const saveToDatabase = async (
   title: string,
   lyrics: string,
   interpretation: string | null
-) => {
+): Promise<Song> => {
   console.log('Saving to database:', { artist, title });
   const { data, error } = await supabase
     .from("songs")
@@ -49,7 +49,7 @@ export const saveToDatabase = async (
       { onConflict: 'artist,title' }
     )
     .select()
-    .maybeSingle();
+    .single();
 
   if (error) {
     console.error("Error saving to database:", error);
@@ -65,7 +65,7 @@ export const fetchLyrics = async ({
 }: { 
   artist: string; 
   title: string;
-}) => {
+}): Promise<{ lyrics: string }> => {
   console.log('Starting lyrics fetch for:', { artist, title });
   // First try to get from database
   const dbSong = await fetchFromDatabase(artist, title);
@@ -85,7 +85,7 @@ export const fetchLyrics = async ({
   }
 };
 
-const fetchFromOVHApi = async (artist: string, title: string) => {
+const fetchFromOVHApi = async (artist: string, title: string): Promise<string> => {
   console.log('Fetching from OVH API - artist:', artist, 'title:', title);
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
