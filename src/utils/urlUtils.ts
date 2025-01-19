@@ -4,8 +4,9 @@ const normalizeText = (text: string): string => {
   // Convert to lowercase first
   const lowercased = text.toLowerCase();
   
-  // Create a mapping of accented characters to their non-accented equivalents
-  const accentMap: { [key: string]: string } = {
+  // Create a mapping of accented characters and special characters to their normalized equivalents
+  const characterMap: { [key: string]: string } = {
+    // Accented characters
     'é': 'e',
     'è': 'e',
     'ê': 'e',
@@ -22,14 +23,21 @@ const normalizeText = (text: string): string => {
     'ü': 'u',
     'ÿ': 'y',
     'ñ': 'n',
-    'ç': 'c'
+    'ç': 'c',
+    // Special characters
+    ''': '',    // Right single quote
+    ''': '',    // Left single quote
+    '\'': '',   // Standard apostrophe
+    '"': '',    // Double quote
+    '"': '',    // Right double quote
+    '"': '',    // Left double quote
   };
   
-  // Replace accented characters with their non-accented equivalents
-  const withoutAccents = lowercased.split('').map(char => accentMap[char] || char).join('');
+  // Replace special characters with their normalized equivalents
+  const normalized = lowercased.split('').map(char => characterMap[char] || char).join('');
   
   // Replace any remaining non-alphanumeric characters with hyphens
-  const withHyphens = withoutAccents.replace(/[^a-z0-9]+/g, '-');
+  const withHyphens = normalized.replace(/[^a-z0-9]+/g, '-');
   
   // Remove leading and trailing hyphens
   return withHyphens.replace(/^-+|-+$/g, '');
