@@ -22,6 +22,14 @@ export const fetchFromDatabase = async (artist: string, title: string): Promise<
   return data;
 };
 
+export const incrementSongHits = async (songId: number) => {
+  const { error } = await supabase.rpc('increment_song_hits', { song_id: songId });
+  
+  if (error) {
+    console.error("Error incrementing song hits:", error);
+  }
+};
+
 export const saveToDatabase = async (
   artist: string,
   title: string,
