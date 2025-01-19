@@ -5,6 +5,7 @@ export const getSongByArtistAndTitle = async (
   artist: string,
   title: string
 ): Promise<Tables<"songs"> | null> => {
+  console.log('Searching for song with artist:', artist, 'and title:', title);
   const { data, error } = await supabase
     .from("songs")
     .select("*")
@@ -17,6 +18,7 @@ export const getSongByArtistAndTitle = async (
     return null;
   }
 
+  console.log('Found song in database:', data);
   return data;
 };
 
@@ -29,6 +31,7 @@ export const incrementSongHits = async (songId: number) => {
 };
 
 export const fetchFromDatabase = async (artist: string, title: string) => {
+  console.log('Fetching from database - artist:', artist, 'title:', title);
   const { data, error } = await supabase
     .from("songs")
     .select("*")
@@ -41,6 +44,7 @@ export const fetchFromDatabase = async (artist: string, title: string) => {
     return null;
   }
 
+  console.log('Database fetch result:', data);
   return data;
 };
 
@@ -50,6 +54,7 @@ export const saveToDatabase = async (
   lyrics: string,
   interpretation: string | null
 ) => {
+  console.log('Saving to database:', { artist, title });
   const { data, error } = await supabase
     .from("songs")
     .upsert(
@@ -73,6 +78,7 @@ export const saveToDatabase = async (
 };
 
 const fetchFromOVHApi = async (artist: string, title: string) => {
+  console.log('Fetching from OVH API - artist:', artist, 'title:', title);
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
 
@@ -92,6 +98,7 @@ const fetchFromOVHApi = async (artist: string, title: string) => {
     }
     
     const data = await response.json();
+    console.log('OVH API response:', data);
     return data.lyrics;
   } catch (error) {
     if (error instanceof Error && error.name === 'AbortError') {
@@ -108,14 +115,17 @@ export const fetchLyrics = async ({
   artist: string; 
   title: string;
 }) => {
+  console.log('Starting lyrics fetch for:', { artist, title });
   // First try to get from database
   const dbSong = await fetchFromDatabase(artist, title);
   if (dbSong?.lyrics) {
+    console.log('Found lyrics in database');
     return { lyrics: dbSong.lyrics };
   }
 
   // If not in database, fetch from API
   try {
+    console.log('No lyrics in database, trying API');
     const lyrics = await fetchFromOVHApi(artist, title);
     return { lyrics };
   } catch (error) {
