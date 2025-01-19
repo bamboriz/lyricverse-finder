@@ -33,39 +33,20 @@ export const incrementSongHits = async (songId: number) => {
 export const fetchFromDatabase = async (artist: string, title: string) => {
   console.log('Fetching from database - artist:', artist, 'title:', title);
   
-  // Try exact match first
-  const { data: exactMatch, error: exactError } = await supabase
+  const { data, error } = await supabase
     .from("songs")
     .select("*")
     .ilike("artist", artist)
     .ilike("title", title)
     .maybeSingle();
 
-  if (exactError) {
-    console.error("Error fetching from database:", exactError);
+  if (error) {
+    console.error("Error fetching from database:", error);
     return null;
   }
 
-  if (exactMatch) {
-    console.log('Found exact match:', exactMatch);
-    return exactMatch;
-  }
-
-  // If no exact match, try with simplified text (removing accents)
-  const { data: simpleMatch, error: simpleError } = await supabase
-    .from("songs")
-    .select("*")
-    .or(`artist.ilike.${artist},artist.ilike.${artist.normalize('NFD').replace(/[\u0300-\u036f]/g, '')}`)
-    .or(`title.ilike.${title},title.ilike.${title.normalize('NFD').replace(/[\u0300-\u036f]/g, '')}`)
-    .maybeSingle();
-
-  if (simpleError) {
-    console.error("Error fetching from database with simplified text:", simpleError);
-    return null;
-  }
-
-  console.log('Database fetch result:', simpleMatch);
-  return simpleMatch;
+  console.log('Database fetch result:', data);
+  return data;
 };
 
 export const saveToDatabase = async (
