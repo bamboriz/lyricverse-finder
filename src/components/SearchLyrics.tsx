@@ -6,6 +6,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { fetchLyrics } from "@/services/songService";
 import { useNavigate } from "react-router-dom";
+import { generateSlug } from "@/utils/urlUtils";
 
 const parseSearchInput = (input: string): { artist: string; title: string } => {
   const firstHyphenIndex = input.indexOf('-');
@@ -22,13 +23,6 @@ const parseSearchInput = (input: string): { artist: string; title: string } => {
   }
   
   return { artist, title };
-};
-
-// This function is only for URL slugs, not database storage
-const generateSlug = (artist: string, title: string) => {
-  const normalizedArtist = artist.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-  const normalizedTitle = title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-  return `${normalizedArtist}--${normalizedTitle}-lyrics-and-meaning`;
 };
 
 export const SearchLyrics = () => {
