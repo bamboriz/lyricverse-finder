@@ -29,7 +29,7 @@ export const getAIInterpretation = async (lyrics: string, title: string, artist:
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini', // Switched back to mini model
+        model: 'gpt-4o', // Switched back to mini model
         messages: [
           {
             role: 'system',
