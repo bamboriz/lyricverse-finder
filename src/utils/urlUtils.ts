@@ -29,10 +29,15 @@ const normalizeText = (text: string): string => {
   const withoutAccents = lowercased.split('').map(char => accentMap[char] || char).join('');
   
   // Replace any remaining non-alphanumeric characters with hyphens
-  const withHyphens = withoutAccents.replace(/[^a-z0-9]+/g, '-');
+  // const withHyphens = withoutAccents.replace(/[^a-z0-9]+/g, '-');
+
+   // Encode non-alphanumeric characters using encodeURIComponent
+  const urlEncoded = withoutAccents
+    .split('')
+    .map(char => /[a-z0-9]/.test(char) ? char : encodeURIComponent(char))
+    .join('');
   
-  // Remove leading and trailing hyphens
-  return withHyphens.replace(/^-+|-+$/g, '');
+  return urlEncoded;
 };
 
 export const generateSlug = (artist: string, title: string) => {
@@ -48,17 +53,17 @@ export const parseSlugForDirectAccess = (slug: string): { artist: string; title:
 
   // Remove the "-lyrics-and-meaning" suffix
   const withoutSuffix = slug.replace(/-lyrics-and-meaning$/, '');
-  
+
   // Split by double hyphen to separate artist and title
   const parts = withoutSuffix.split('--');
-  
+
   if (parts.length !== 2) {
     throw new Error('Invalid URL format: missing artist-title separator');
   }
 
-  // Convert hyphens back to spaces
-  const artist = parts[0].replace(/-/g, ' ').trim();
-  const title = parts[1].replace(/-/g, ' ').trim();
+  // Decode each part using decodeURIComponent to restore special characters
+  const artist = decodeURIComponent(parts[0]).trim();
+  const title = decodeURIComponent(parts[1]).trim();
 
   if (!artist || !title) {
     throw new Error('Invalid URL format: missing artist or title');
