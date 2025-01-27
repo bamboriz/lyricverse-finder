@@ -32,7 +32,7 @@ const normalizeText = (text: string): string => {
   // const withHyphens = withoutAccents.replace(/[^a-z0-9]+/g, '-');
   
   // Remove leading and trailing hyphens
-  return withHyphens.replace(/^-+|-+$/g, '');
+  return withoutAccents.replace(/^-+|-+$/g, '');
 };
 
 export const generateSlug = (artist: string, title: string) => {
