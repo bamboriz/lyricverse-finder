@@ -33,15 +33,18 @@ export const getAIInterpretation = async (lyrics: string, title: string, artist:
         messages: [
           {
             role: 'system',
-            content: 'You are a music expert who specializes in breaking down song lyrics with engaging, clear, and concise explanations. Provide simple interpretations of each verse, focusing on the main themes, symbolism, and emotional meaning. Use straightforward language that anyone can understand while capturing the essence of the song. Keep it brief, insightful, and impactful. NO MARKDOWN!'
+            content: 'You are a music expert specializing in breaking down song lyrics.'
           },
           {
             role: 'user',
-            content: `Please interpret the lyrics of "${title}" by ${artist}:\n\n${lyrics}`
+            content: `Provide a fun interpretation, focusing on the main themes, symbolism, and emotional meaning. 
+                      Use grade 9 English while capturing the essence of the song. Keep it insightful and impactful, ensuring depth in your analysis.
+                      KEEP A FUN TONE AND DO NOT WRITE IN MARKDOWN!
+                      Please interpret the lyrics of "${title}" by ${artist} in plain text:\n\n${lyrics}`
           }
         ],
         max_tokens: 2000, // Keeping increased token limit for interpretation
-        temperature: 0.7,
+        temperature: 0.32,
       })
     });
 
