@@ -38,7 +38,7 @@ export const getAIInterpretation = async (lyrics: string, title: string, artist:
           {
             role: 'user',
             content: `Provide a fun concise interpretation, focusing on the main themes, symbolism, and emotional meaning. 
-                      Use grade 9 English while capturing the essence of the song. Keep it insightful and impactful, ensuring depth in your analysis.
+                      Use grade 9 English while capturing the essence of the song. Keep your analysis it insightful and engaging.
                       DO NOT WRITE IN MARKDOWN!
                       Please interpret the lyrics of "${title}" by ${artist} in plain text:\n\n${lyrics}`
           }
