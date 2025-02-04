@@ -1,5 +1,8 @@
 import { SearchLyrics } from "@/components/SearchLyrics";
 import { Helmet } from "react-helmet";
+import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const Index = () => {
   return (
@@ -11,7 +14,13 @@ const Index = () => {
         <meta property="og:url" content="https://lyriko.xyz" />
         <meta property="og:type" content="website" />
       </Helmet>
-      <div className="absolute right-0 top-0 p-4 md:p-6 w-full flex justify-end">
+      <div className="absolute right-0 top-0 p-4 md:p-6 w-full flex justify-between">
+        <Link to="/songs/new">
+          <Button variant="ghost" size="sm" className="flex items-center gap-2">
+            <Plus className="h-4 w-4" />
+            Add New Song
+          </Button>
+        </Link>
         <a 
           href="https://www.tiktok.com/@lyrikoxyz" 
           target="_blank" 
