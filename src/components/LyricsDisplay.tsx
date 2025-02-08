@@ -167,7 +167,7 @@ export const LyricsDisplay = ({
       </div>
 
       {!isMobile && (
-        <div className="mt-32">
+        <div className="mt-64">
           <LyricCards lyrics={lyrics} songTitle={songTitle} artist={artist} />
         </div>
       )}
