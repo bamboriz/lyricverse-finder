@@ -133,17 +133,31 @@ export const LyricsDisplay = ({
     <div className="space-y-4 w-full container px-4 sm:px-6 max-w-7xl mx-auto">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {isMobile ? (
-          <Collapsible>
-            <CollapsibleTrigger className="w-full">
-              <div className="flex items-center justify-between p-4 bg-white shadow-lg rounded-xl">
-                <span className="text-lg font-semibold text-primary">View Lyrics</span>
-                <ChevronDown className="h-5 w-5" />
-              </div>
-            </CollapsibleTrigger>
-            <CollapsibleContent className="mt-4">
-              <LyricsContent />
-            </CollapsibleContent>
-          </Collapsible>
+          <>
+            <Collapsible>
+              <CollapsibleTrigger className="w-full">
+                <div className="flex items-center justify-between p-4 bg-white shadow-lg rounded-xl">
+                  <span className="text-lg font-semibold text-primary">View Lyrics</span>
+                  <ChevronDown className="h-5 w-5" />
+                </div>
+              </CollapsibleTrigger>
+              <CollapsibleContent className="mt-4">
+                <LyricsContent />
+              </CollapsibleContent>
+            </Collapsible>
+            
+            <Collapsible>
+              <CollapsibleTrigger className="w-full">
+                <div className="flex items-center justify-between p-4 bg-white shadow-lg rounded-xl">
+                  <span className="text-lg font-semibold text-primary">View Interpretation</span>
+                  <ChevronDown className="h-5 w-5" />
+                </div>
+              </CollapsibleTrigger>
+              <CollapsibleContent className="mt-4">
+                <InterpretationContent />
+              </CollapsibleContent>
+            </Collapsible>
+          </>
         ) : (
           <>
             <div className={`${interpretationFirst ? 'order-2' : 'order-1'}`}>
