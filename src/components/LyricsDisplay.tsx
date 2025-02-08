@@ -1,3 +1,4 @@
+
 import { Card } from "@/components/ui/card";
 import { LyricCards } from "./LyricCards";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
@@ -22,6 +23,7 @@ interface LyricsDisplayProps {
   isLoadingInterpretation: boolean;
   songTitle?: string;
   artist?: string;
+  interpretationFirst?: boolean;
 }
 
 export const LyricsDisplay = ({ 
@@ -29,7 +31,8 @@ export const LyricsDisplay = ({
   interpretation, 
   isLoadingInterpretation,
   songTitle,
-  artist
+  artist,
+  interpretationFirst = false
 }: LyricsDisplayProps) => {
   const isMobile = useIsMobile();
   const [isEditing, setIsEditing] = useState(false);
@@ -105,6 +108,27 @@ export const LyricsDisplay = ({
     </Card>
   );
 
+  const InterpretationContent = () => (
+    <Card className="p-8 bg-white shadow-lg rounded-xl border-0">
+      <h2 className="text-3xl font-bold mb-8 text-primary">Interpretation</h2>
+      <div className="prose prose-lg max-w-none">
+        {isLoadingInterpretation ? (
+          <div className="flex items-center justify-center">
+            <div className="animate-pulse text-primary">Analyzing lyrics...</div>
+          </div>
+        ) : interpretation ? (
+          <div className="text-lg leading-relaxed text-gray-800 whitespace-pre-line">
+            {interpretation}
+          </div>
+        ) : (
+          <div className="text-gray-500 italic">
+            Click "Get AI Interpretation" to analyze these lyrics
+          </div>
+        )}
+      </div>
+    </Card>
+  );
+
   return (
     <div className="space-y-4 w-full container px-4 sm:px-6 max-w-7xl mx-auto">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -121,27 +145,15 @@ export const LyricsDisplay = ({
             </CollapsibleContent>
           </Collapsible>
         ) : (
-          <LyricsContent />
+          <>
+            <div className={`${interpretationFirst ? 'order-2' : 'order-1'}`}>
+              <LyricsContent />
+            </div>
+            <div className={`${interpretationFirst ? 'order-1' : 'order-2'}`}>
+              <InterpretationContent />
+            </div>
+          </>
         )}
-
-        <Card className="p-8 bg-white shadow-lg rounded-xl border-0">
-          <h2 className="text-3xl font-bold mb-8 text-primary">Interpretation</h2>
-          <div className="prose prose-lg max-w-none">
-            {isLoadingInterpretation ? (
-              <div className="flex items-center justify-center">
-                <div className="animate-pulse text-primary">Analyzing lyrics...</div>
-              </div>
-            ) : interpretation ? (
-              <div className="text-lg leading-relaxed text-gray-800 whitespace-pre-line">
-                {interpretation}
-              </div>
-            ) : (
-              <div className="text-gray-500 italic">
-                Click "Get AI Interpretation" to analyze these lyrics
-              </div>
-            )}
-          </div>
-        </Card>
       </div>
 
       <div className="mt-16">

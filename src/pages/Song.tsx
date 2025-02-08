@@ -1,3 +1,4 @@
+
 import { useParams, useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { LyricsDisplay } from "@/components/LyricsDisplay";
@@ -121,6 +122,7 @@ export const Song = () => {
           isLoadingInterpretation={false}
           songTitle={song.title}
           artist={song.artist}
+          interpretationFirst={true}
         />
       )}
     </div>
