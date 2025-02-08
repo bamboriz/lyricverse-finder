@@ -1,3 +1,4 @@
+
 import { useState, useRef } from "react";
 import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
@@ -71,7 +72,7 @@ export const LyricCards = ({ lyrics, songTitle = "Unknown Song", artist = "Unkno
   };
 
   return (
-    <div className="w-full px-2">
+    <div className="w-full px-2 pt-32">
       <h2 className="text-2xl font-bold mb-4 text-primary">Create Lyric Card</h2>
       <Card className="p-4 bg-white/50 backdrop-blur-sm border-accent w-full">
         <h3 className="font-semibold mb-2">Customize your lyric</h3>
