@@ -138,16 +138,18 @@ export const LyricsDisplay = ({
             <div className="mt-8 mb-16">
               <LyricCards lyrics={lyrics} songTitle={songTitle} artist={artist} />
             </div>
-            <div className="fixed bottom-0 left-0 right-0 z-50 p-4 bg-background/80 backdrop-blur-sm border-t border-accent">
+            <div className="fixed bottom-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-sm border-t border-accent">
               <Collapsible>
-                <CollapsibleTrigger className="w-full">
+                <CollapsibleTrigger className="w-full p-4">
                   <div className="flex items-center justify-between p-4 bg-white shadow-lg rounded-xl">
                     <span className="text-lg font-semibold text-primary">View Lyrics</span>
                     <ChevronDown className="h-5 w-5" />
                   </div>
                 </CollapsibleTrigger>
-                <CollapsibleContent className="mt-4">
-                  <LyricsContent />
+                <CollapsibleContent>
+                  <div className="p-4 max-h-[60vh] overflow-y-auto">
+                    <LyricsContent />
+                  </div>
                 </CollapsibleContent>
               </Collapsible>
             </div>
