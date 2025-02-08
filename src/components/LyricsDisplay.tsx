@@ -134,6 +134,7 @@ export const LyricsDisplay = ({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {isMobile ? (
           <>
+            <InterpretationContent />
             <Collapsible>
               <CollapsibleTrigger className="w-full">
                 <div className="flex items-center justify-between p-4 bg-white shadow-lg rounded-xl">
@@ -143,18 +144,6 @@ export const LyricsDisplay = ({
               </CollapsibleTrigger>
               <CollapsibleContent className="mt-4">
                 <LyricsContent />
-              </CollapsibleContent>
-            </Collapsible>
-            
-            <Collapsible>
-              <CollapsibleTrigger className="w-full">
-                <div className="flex items-center justify-between p-4 bg-white shadow-lg rounded-xl">
-                  <span className="text-lg font-semibold text-primary">View Interpretation</span>
-                  <ChevronDown className="h-5 w-5" />
-                </div>
-              </CollapsibleTrigger>
-              <CollapsibleContent className="mt-4">
-                <InterpretationContent />
               </CollapsibleContent>
             </Collapsible>
           </>
