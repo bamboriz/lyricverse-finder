@@ -42,9 +42,9 @@ async function generateLocalSitemap() {
     // Get the directory of the current module
     const __dirname = path.dirname(fileURLToPath(import.meta.url));
     const publicDir = path.join(__dirname, '../../public');
-    fs.writeFileSync(path.join(publicDir, 'sitemap.xml'), xml);
+    fs.writeFileSync(path.join(publicDir, 'sitemap_new.xml'), xml);
 
-    console.log('Sitemap generated successfully at public/sitemap.xml');
+    console.log('Sitemap generated successfully at public/sitemap_new.xml');
     console.log(`Total songs in sitemap: ${songs.length}`);
   } catch (error) {
     console.error('Error generating sitemap:', error);
