@@ -103,6 +103,9 @@ export const LyricsDisplay = ({
       ) : (
         <div className="font-serif text-xl leading-relaxed whitespace-pre-wrap text-center">
           {formatLyrics(lyrics)}
+          <div className="mt-8 text-sm text-gray-500 italic">
+            Lyrics licensed by MusixMatch
+          </div>
         </div>
       )}
     </Card>
@@ -174,3 +177,4 @@ export const LyricsDisplay = ({
     </div>
   );
 };
+
