@@ -16,22 +16,24 @@
     <meta name="google-site-verification" content="9AAmFgarR3ca-8485tI2db_iBKpRJGIxXToKrq_JENg" />
     <link rel="icon" type="image/png" href="/lovable-uploads/2b293ef1-1764-4f9b-b412-809c7f7ce377.png" />
     
-    <!-- Preload critical fonts -->
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" as="style" />
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,400;0,700;1,400&display=swap" as="style" />
-    
-    <!-- Load fonts with display=swap -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap&display=swap" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,400;0,700;1,400&display=swap&display=swap" />
-    
+    <!-- Critical meta tags first -->
     <title>Lyriko</title>
     <meta name="description" content="Get lyrics and meanings of your favorite songs" />
     <meta name="author" content="Lovable" />
     <meta property="og:image" content="/lovable-uploads/2b293ef1-1764-4f9b-b412-809c7f7ce377.png" />
+    
+    <!-- Preload critical fonts -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" as="style" />
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,400;0,700;1,400&display=swap" as="style" />
+    
+    <!-- Load fonts with display=swap - removed duplicate &display=swap -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,400;0,700;1,400&display=swap" />
   </head>
 
   <body>
     <div id="root"></div>
+    <!-- Load non-critical scripts with defer -->
     <script src="https://cdn.gpteng.co/gptengineer.js" type="module"></script>
     <script type="module" src="/src/main.tsx"></script>
   </body>

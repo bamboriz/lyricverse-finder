@@ -6,6 +6,7 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Critical CSS Variables - keeping these in the main CSS */
 @layer base {
   :root {
     --background: 0 0% 100%;

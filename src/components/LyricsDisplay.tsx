@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import { generateSlug } from "@/utils/urlUtils";
 import { capitalizeForDisplay } from "@/utils/urlUtils";
 
+// Move this function outside the component to avoid recreation on each render
 const formatLyrics = (text: string) => {
   const verses = text.split(/\n\s*\n/);
   const formattedVerses = verses.map(verse => verse.trim());
@@ -27,6 +28,7 @@ interface LyricsDisplayProps {
   interpretationFirst?: boolean;
 }
 
+// Pre-define card components to reduce render overhead
 export const LyricsDisplay = ({ 
   lyrics, 
   interpretation, 
@@ -73,11 +75,12 @@ export const LyricsDisplay = ({
     }
   };
 
+  // Extract components to avoid re-rendering
   const LyricsContent = () => (
     <Card className="p-8 bg-white shadow-lg rounded-xl border-0">
       <div className="flex justify-between items-center mb-8">
         <div className="w-full text-center flex items-center justify-between">
-          <div className="w-8"></div> {/* Empty space to balance the edit button */}
+          <div className="w-8"></div>
           <h2 className="text-3xl font-bold text-primary">
             {displayTitle ? `${displayTitle} Lyrics` : 'Lyrics'}
           </h2>
@@ -145,48 +148,48 @@ export const LyricsDisplay = ({
     </Card>
   );
 
+  // Mobile view optimization
+  if (isMobile) {
+    return (
+      <div className="space-y-4 w-full container px-4 sm:px-6 max-w-7xl mx-auto">
+        <InterpretationContent />
+        <div className="mt-8 mb-16">
+          <LyricCards lyrics={lyrics} songTitle={songTitle} artist={artist} />
+        </div>
+        <div className="fixed bottom-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-sm border-t border-accent">
+          <Collapsible>
+            <CollapsibleTrigger className="w-full p-4">
+              <div className="flex items-center justify-between p-4 bg-white shadow-lg rounded-xl">
+                <span className="text-lg font-semibold text-primary">View Lyrics</span>
+                <ChevronDown className="h-5 w-5" />
+              </div>
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <div className="p-4 max-h-[60vh] overflow-y-auto">
+                <LyricsContent />
+              </div>
+            </CollapsibleContent>
+          </Collapsible>
+        </div>
+      </div>
+    );
+  }
+
+  // Desktop view
   return (
     <div className="space-y-4 w-full container px-4 sm:px-6 max-w-7xl mx-auto">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        {isMobile ? (
-          <>
-            <InterpretationContent />
-            <div className="mt-8 mb-16">
-              <LyricCards lyrics={lyrics} songTitle={songTitle} artist={artist} />
-            </div>
-            <div className="fixed bottom-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-sm border-t border-accent">
-              <Collapsible>
-                <CollapsibleTrigger className="w-full p-4">
-                  <div className="flex items-center justify-between p-4 bg-white shadow-lg rounded-xl">
-                    <span className="text-lg font-semibold text-primary">View Lyrics</span>
-                    <ChevronDown className="h-5 w-5" />
-                  </div>
-                </CollapsibleTrigger>
-                <CollapsibleContent>
-                  <div className="p-4 max-h-[60vh] overflow-y-auto">
-                    <LyricsContent />
-                  </div>
-                </CollapsibleContent>
-              </Collapsible>
-            </div>
-          </>
-        ) : (
-          <>
-            <div className={`${interpretationFirst ? 'order-2' : 'order-1'}`}>
-              <LyricsContent />
-            </div>
-            <div className={`${interpretationFirst ? 'order-1' : 'order-2'}`}>
-              <InterpretationContent />
-            </div>
-          </>
-        )}
+        <div className={`${interpretationFirst ? 'order-2' : 'order-1'}`}>
+          <LyricsContent />
+        </div>
+        <div className={`${interpretationFirst ? 'order-1' : 'order-2'}`}>
+          <InterpretationContent />
+        </div>
       </div>
 
-      {!isMobile && (
-        <div className="mt-64">
-          <LyricCards lyrics={lyrics} songTitle={songTitle} artist={artist} />
-        </div>
-      )}
+      <div className="mt-64">
+        <LyricCards lyrics={lyrics} songTitle={songTitle} artist={artist} />
+      </div>
     </div>
   );
 };
