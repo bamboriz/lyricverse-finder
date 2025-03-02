@@ -23,14 +23,8 @@ export const SongMetadata = ({ title, artist, interpretation }: SongMetadataProp
   return (
     <Helmet>
       <title>{metaTitle}</title>
-      <meta 
-        property="og:title" 
-        content={`${displayTitle} Lyrics Meaning - ${displayArtist} | Lyriko`} 
-      />
-      <meta 
-        property="og:description" 
-        content={metaDescription} 
-      />
+      <meta property="og:title" content={`${displayTitle} Lyrics Meaning - ${displayArtist} | Lyriko`} />
+      <meta property="og:description" content={metaDescription} />
       <meta name="description" content={metaDescription} />
       <meta property="og:url" content={window.location.href} />
       <meta property="og:type" content="article" />
