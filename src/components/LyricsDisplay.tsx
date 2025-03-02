@@ -1,4 +1,3 @@
-
 import { Card } from "@/components/ui/card";
 import { LyricCards } from "./LyricCards";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
@@ -63,7 +62,6 @@ export const LyricsDisplay = ({
 
       toast.success("Lyrics updated successfully!");
       setIsEditing(false);
-      // Force a page reload to refresh the data
       const slug = generateSlug(artist, songTitle);
       window.location.replace(`/songs/${slug}`);
     } catch (error) {
@@ -79,7 +77,6 @@ export const LyricsDisplay = ({
       <div className="flex justify-between items-center mb-8">
         <h2 className="text-3xl font-bold text-primary">
           {displayTitle ? `${displayTitle} Lyrics` : 'Lyrics'}
-          {displayArtist && <span className="text-2xl font-medium"> by {displayArtist}</span>}
         </h2>
         <Button
           variant="ghost"
@@ -122,7 +119,6 @@ export const LyricsDisplay = ({
     <Card className="p-8 bg-white shadow-lg rounded-xl border-0">
       <h2 className="text-3xl font-bold mb-8 text-primary">
         {displayTitle ? `${displayTitle} Meaning` : 'Interpretation'}
-        {displayArtist && <span className="text-2xl font-medium"> by {displayArtist}</span>}
       </h2>
       <div className="prose prose-lg max-w-none">
         {isLoadingInterpretation ? (
@@ -132,9 +128,7 @@ export const LyricsDisplay = ({
         ) : interpretation ? (
           <div className="text-lg leading-relaxed text-gray-800 whitespace-pre-line">
             <h3 className="text-xl font-semibold mb-4">
-              {displayTitle && displayArtist 
-                ? `What ${displayTitle} by ${displayArtist} Means` 
-                : 'Song Analysis'}
+              What {displayTitle} Means
             </h3>
             {interpretation}
           </div>
