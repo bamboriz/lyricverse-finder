@@ -10,6 +10,7 @@ import { Textarea } from "./ui/textarea";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { generateSlug } from "@/utils/urlUtils";
+import { capitalizeForDisplay } from "@/utils/urlUtils";
 
 const formatLyrics = (text: string) => {
   const verses = text.split(/\n\s*\n/);
@@ -38,6 +39,9 @@ export const LyricsDisplay = ({
   const [isEditing, setIsEditing] = useState(false);
   const [editedLyrics, setEditedLyrics] = useState(lyrics);
   const [isSaving, setIsSaving] = useState(false);
+
+  const displayTitle = songTitle ? capitalizeForDisplay(songTitle) : '';
+  const displayArtist = artist ? capitalizeForDisplay(artist) : '';
 
   const handleSave = async () => {
     if (!artist || !songTitle) {
@@ -73,7 +77,10 @@ export const LyricsDisplay = ({
   const LyricsContent = () => (
     <Card className="p-8 bg-white shadow-lg rounded-xl border-0">
       <div className="flex justify-between items-center mb-8">
-        <h2 className="text-3xl font-bold text-primary">Lyrics</h2>
+        <h2 className="text-3xl font-bold text-primary">
+          {displayTitle ? `${displayTitle} Lyrics` : 'Lyrics'}
+          {displayArtist && <span className="text-2xl font-medium"> by {displayArtist}</span>}
+        </h2>
         <Button
           variant="ghost"
           size="icon"
@@ -113,7 +120,10 @@ export const LyricsDisplay = ({
 
   const InterpretationContent = () => (
     <Card className="p-8 bg-white shadow-lg rounded-xl border-0">
-      <h2 className="text-3xl font-bold mb-8 text-primary">Interpretation</h2>
+      <h2 className="text-3xl font-bold mb-8 text-primary">
+        {displayTitle ? `${displayTitle} Meaning` : 'Interpretation'}
+        {displayArtist && <span className="text-2xl font-medium"> by {displayArtist}</span>}
+      </h2>
       <div className="prose prose-lg max-w-none">
         {isLoadingInterpretation ? (
           <div className="flex items-center justify-center">
@@ -121,6 +131,11 @@ export const LyricsDisplay = ({
           </div>
         ) : interpretation ? (
           <div className="text-lg leading-relaxed text-gray-800 whitespace-pre-line">
+            <h3 className="text-xl font-semibold mb-4">
+              {displayTitle && displayArtist 
+                ? `What ${displayTitle} by ${displayArtist} Means` 
+                : 'Song Analysis'}
+            </h3>
             {interpretation}
           </div>
         ) : (
@@ -177,4 +192,3 @@ export const LyricsDisplay = ({
     </div>
   );
 };
-
