@@ -1,3 +1,4 @@
+
 import { Card } from "@/components/ui/card";
 import { LyricCards } from "./LyricCards";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
@@ -75,27 +76,30 @@ export const LyricsDisplay = ({
   const LyricsContent = () => (
     <Card className="p-8 bg-white shadow-lg rounded-xl border-0">
       <div className="flex justify-between items-center mb-8">
-        <h2 className="text-3xl font-bold text-primary">
-          {displayTitle ? `${displayTitle} Lyrics` : 'Lyrics'}
-        </h2>
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => {
-            if (isEditing) {
-              handleSave();
-            } else {
-              setIsEditing(true);
-            }
-          }}
-          disabled={isSaving}
-        >
-          {isEditing ? (
-            <Save className="h-5 w-5" />
-          ) : (
-            <Edit2 className="h-5 w-5" />
-          )}
-        </Button>
+        <div className="w-full text-center flex items-center justify-between">
+          <div className="w-8"></div> {/* Empty space to balance the edit button */}
+          <h2 className="text-3xl font-bold text-primary">
+            {displayTitle ? `${displayTitle} Lyrics` : 'Lyrics'}
+          </h2>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => {
+              if (isEditing) {
+                handleSave();
+              } else {
+                setIsEditing(true);
+              }
+            }}
+            disabled={isSaving}
+          >
+            {isEditing ? (
+              <Save className="h-5 w-5" />
+            ) : (
+              <Edit2 className="h-5 w-5" />
+            )}
+          </Button>
+        </div>
       </div>
       {isEditing ? (
         <Textarea
