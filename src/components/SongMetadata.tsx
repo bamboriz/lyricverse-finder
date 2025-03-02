@@ -12,17 +12,20 @@ export const SongMetadata = ({ title, artist, interpretation }: SongMetadataProp
   const displayTitle = capitalizeForDisplay(title);
   const displayArtist = capitalizeForDisplay(artist);
   
-  // Create a more detailed meta description
+  // Create more engaging meta titles and descriptions
+  const metaTitle = `${displayTitle} by ${displayArtist} - Lyrics Meaning & Analysis | Lyriko`;
+  
+  // Create a more engaging meta description
   const metaDescription = interpretation 
-    ? `Discover the meaning behind "${displayTitle}" by ${displayArtist}. ${interpretation.split(' ').slice(0, 20).join(' ')}... Get lyrics, interpretation, and deeper insights into this song's message.`
-    : `Explore the lyrics and meaning of "${displayTitle}" by ${displayArtist}. Find detailed song interpretation, analysis, and deeper understanding of the song's message.`;
+    ? `Decode the true meaning of "${displayTitle}" by ${displayArtist}. Uncover hidden messages, songwriter's intentions, and story behind the lyrics. Get the full analysis now!`
+    : `What does "${displayTitle}" by ${displayArtist} really mean? Dive into the lyrics, discover the song's hidden message, and understand the artist's true intentions. Full analysis inside!`;
 
   return (
     <Helmet>
-      <title>{`${displayTitle} by ${displayArtist} - Lyrics and Meaning | Lyriko`}</title>
+      <title>{metaTitle}</title>
       <meta 
         property="og:title" 
-        content={`${displayTitle} by ${displayArtist} - Lyrics Meaning and Interpretation`} 
+        content={`${displayTitle} Lyrics Meaning - What "${displayArtist}" Really Meant | Lyriko`} 
       />
       <meta 
         property="og:description" 
